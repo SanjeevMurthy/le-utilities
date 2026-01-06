@@ -100,3 +100,34 @@ _Edit text without entering Insert Mode._
 | `p`        | **P**aste after cursor        | Pastes the deleted or yanked line.                  |
 
 > **Exercise**: Type a sentence with typos. Use `x` to delete extra chars, `r` to fix wrong chars, and `dd` / `p` to move lines around.
+
+
+---
+
+## 6. Deleting Text Efficiently (Normal Mode)
+
+_Delete precisely without touching Insert Mode._
+
+### Delete Word
+
+| Key | Action | Tip |
+| :-- | :------------------------------ | :----------------------------------------- |
+| `dw` | Delete from cursor to end of **w**ord | Most commonly used. |
+| `db` | Delete backward to start of word | Useful when cursor is in the middle. |
+| `de` | Delete to **e**nd of word | Stops exactly at word end. |
+| `diw` | Delete **i**nner **w**ord | Deletes the whole word, cursor anywhere. |
+| `daw` | Delete **a** **w**ord (incl. space) | Removes word + trailing space. |
+
+### Delete Line
+
+| Key | Action | Tip |
+| :-- | :------------------------------ | :----------------------------------------- |
+| `dd` | Delete entire line | Line is cut to buffer. |
+| `D` | Delete from cursor to end of line | Same as `d$`. |
+| `d0` | Delete from cursor to start of line | Absolute beginning. |
+| `d^` | Delete to first non-blank character | Safer for code indentation. |
+| `:n,md` | Delete lines from `n` to `m` | Example: `:5,10d`. |
+
+> **Exercise**: Take a paragraph of text. Practice `dw`, `diw`, `dd`, and `D` until you can delete exactly what you want without overthinking.
+
+---
