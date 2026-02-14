@@ -1,0 +1,12 @@
+move to the top of the file
+move to the bottom of the file
+move to start of the lines
+move to end of the lines
+delete previous word
+delete next word
+select and copy lines
+paste the copied lines
+indent lines
+select all lines
+view line numbers
+go to linenumber, without changing indent
