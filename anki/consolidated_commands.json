@@ -1,0 +1,1754 @@
+[
+  {
+    "command": "kubeadm join <control-plane-ip>:6443 \\ --token <token> \\ --discovery-token-ca-cert-hash sha256:<hash>",
+    "question": "What command joins a worker node to a kubeadm-initialized cluster?",
+    "notes": "This command is provided at the end of kubeadm init. If the token expires, you can generate a new one with kubeadm token create.  --discovery-token-ca-cert-hash is a SHA-256 hash of the cluster CA public certificate, used to securely verify the API server\u2019s identity during node join. It is generated from /etc/kubernetes/pki/ca.crt or automatically provided by kubeadm token create --print-join-command",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "ETCDCTL_API=3 etcdctl snapshot save /opt/cluster_backup.db \\ --endpoints=https://127.0.0.1:2379 \\ --cacert=/etc/kubernetes/pki/etcd/ca.crt \\ --cert=/etc/kubernetes/pki/etcd/server.crt \\ --key=/etc/kubernetes/pki/etcd/server.key",
+    "question": "How do you create a backup of an etcd cluster managed by kubeadm?",
+    "notes": "Backing up etcd is critical for disaster recovery. Ensure you use the correct certificates and endpoint for your cluster.  PartMeaningETCDCTL_API=3Forces etcdctl to use v3 API (mandatory)snapshot restoreRestores etcd data from snapshot/opt/cluster_backup.dbPath to the snapshot file--data-dir=/var/lib/etcdDirectory where etcd stores its data",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create role pod-reader --verb=get,list --resource=pods -n dev",
+    "question": "How do you create a Role that grants 'get' and 'list' permissions on Pods in the 'dev' namespace?",
+    "notes": "This is an imperative command. You would then use a RoleBinding to grant this Role to a user or ServiceAccount.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl set image deployment/ = or by applying an updated manifest file with kubectl apply -f .",
+    "question": "How do you perform a rolling update for a Deployment?",
+    "notes": "A rolling update incrementally replaces old Pods with new ones, ensuring zero downtime. Use kubectl rollout status to monitor the progress.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl rollout undo deployment/",
+    "question": "You've updated a Deployment's container image, but it's causing errors. What is the command to quickly revert to the previous working version?",
+    "notes": "The exam will test your ability to perform rollbacks. You can also roll back to a specific version using kubectl rollout undo deployment/ --to-revision=.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl taint nodes key=value:NoSchedule",
+    "question": "How do you apply a taint to a node to prevent new Pods from being scheduled on it?",
+    "notes": "Pods must have a corresponding toleration to be scheduled on a tainted node. This is often used to dedicate nodes for specific workloads.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl exec -it -- nslookup or kubectl exec -it -- curl .",
+    "question": "How do you debug DNS resolution issues from within a Pod?",
+    "notes": "If nslookup fails, it points to a problem with CoreDNS.   If nslookup succeeds but curl fails, it might be a network policy or kube-proxy issue.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl top node and kubectl top pod.",
+    "question": "How can you see the resource usage (CPU/Memory) of your nodes and pods?",
+    "notes": "This requires the Metrics Server to be installed in the cluster. It provides a quick overview of resource consumption.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl exec -it -c -- /bin/sh",
+    "question": "How do you get a shell inside a running container?",
+    "notes": "This is an essential command for debugging running applications. If the container doesn't have /bin/sh, try /bin/bash.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl rollout pause deployment/ and kubectl rollout resume deployment/.",
+    "question": "How can you pause and resume a Deployment rollout?",
+    "notes": "Pausing a deployment allows you to make multiple changes to the Deployment object before a new rollout is triggered.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create serviceaccount",
+    "question": "How can you create a ServiceAccount?",
+    "notes": "ServiceAccounts provide an identity for processes that run in a Pod. They are often used with RBAC to grant specific permissions to applications.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl auth can-i --as -n",
+    "question": "How do you check if a particular user or ServiceAccount can perform an action?",
+    "notes": "This is a useful command to debug RBAC permission issues without having to parse through Roles and RoleBindings.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get -o yaml",
+    "question": "How do you get the YAML manifest of a running object in the cluster?",
+    "notes": "This is useful for inspecting the current state of an object or for using an existing object as a template for a new one.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "Helm is a package manager for Kubernetes that helps you define, install, and upgrade even the most complex Kubernetes applications. Helm packages are called charts.",
+    "question": "What is the purpose of Helm in Kubernetes administration?",
+    "notes": "Helm simplifies the management of application deployments and their dependencies.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create configmap --from-file=",
+    "question": "How do you create a ConfigMap from a file?",
+    "notes": "ConfigMaps are used to store non-confidential configuration data as key-value pairs. Pods can consume them as environment variables, command-line arguments, or as configuration files in a volume.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get events --all-namespaces --sort-by='.metadata.creationTimestamp'",
+    "question": "How do you view all events in the cluster?",
+    "notes": "This command is extremely useful for getting a chronological overview of what has been happening in the cluster, especially when debugging complex issues.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "minikube or kind (Kubernetes IN Docker).",
+    "question": "What tool can you use to manage Kubernetes clusters on your local machine for development?",
+    "notes": "These tools provide a lightweight, single-node Kubernetes cluster that is easy to set up and tear down.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl run nginx --image=nginx",
+    "question": "How can you imperatively create a simple Nginx Pod?",
+    "notes": "While kubectl run is quick for creating single Pods for testing, for production workloads you should always use declarative manifests and higher-level objects like Deployments.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl expose deployment --type=NodePort --port=80",
+    "question": "How can you imperatively expose a Deployment as a Service?",
+    "notes": "This is a quick way to create a Service for a Deployment. You can then use kubectl get svc to find the allocated NodePort.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get nodes",
+    "question": "What command would you use to find out which nodes are ready?",
+    "notes": "The STATUS column will show Ready for healthy nodes. You can use kubectl describe node  to get more details about a node's condition.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get all -n",
+    "question": "How can you list all resources in a specific namespace?",
+    "notes": "Note that kubectl get all does not actually get all resources. It gets a common set of resources like Pods, Services, Deployments, and ReplicaSets. It does not include things like ConfigMaps, Secrets, or Ingresses.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl apply -f https://",
+    "question": "How do you apply a YAML file from a URL?",
+    "notes": "This is a common way to install applications or components directly from their source repositories.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl version",
+    "question": "How do you check the version of the Kubernetes API server?",
+    "notes": "This command shows both the client (kubectl) version and the server version. It's important to keep these versions from skewing too far apart.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pod -o wide or kubectl get pod -o jsonpath='{.status.podIP}'",
+    "question": "How do you get the IP address of a Pod?",
+    "notes": "The -o wide option provides more information, including the Pod's IP and the node it's running on.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl delete pod --grace-period=0 --force",
+    "question": "How do you force delete a Pod that is stuck in the Terminating state?",
+    "notes": "This should be used as a last resort, as it can have side effects on the node and for stateful applications. The pod may be stuck terminating because the node it is on is down or the Kubelet is not responding.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl top pods --all-namespaces --sort-by=cpu",
+    "question": "How would you find the top 5 most CPU-intensive pods?",
+    "notes": "head -n 6 (head -n 6 to include the header line).",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl drain --ignore-daemonsets",
+    "question": "How do you safely prepare a node for maintenance, ensuring all workloads are moved off it?",
+    "notes": "This command cordons the node (making it unschedulable) and then evicts all Pods. Use --ignore-daemonsets because DaemonSet Pods are not meant to be evicted.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key snapshot save /opt/snapshot.db",
+    "question": "What command creates a snapshot of an etcd database for a cluster with TLS enabled?",
+    "notes": "Knowing how to back up etcd is a critical CKA task. You must provide the correct certificates and endpoint for the command to succeed.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl auth can-i create pods --as dev-user -n apps",
+    "question": "What kubectl command allows you to quickly check if a specific user can perform an action, for instance, if 'dev-user' can create pods in the 'apps' namespace?",
+    "notes": "\"This is an essential command for debugging RBAC issues without needing to parse Role and RoleBinding YAML. It provides a quick \"\"yes\"\" or \"\"no\"\" answer.\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create deploy webapp --image=nginx --replicas=3",
+    "question": "How do you create a Deployment named 'webapp' with image 'nginx' and 3 replicas using an imperative command?",
+    "notes": "This is the fastest way to generate a Deployment YAML or create it directly. Since imperative commands don't support every possible configuration option, a common exam strategy is to use this command with --dry-run=client -o yaml to generate a base template, then modify the YAML file to add advanced fields like livenessProbes or resources.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl scale deploy frontend --replicas=5",
+    "question": "What kubectl command scales the deployment 'frontend' to 5 replicas?",
+    "notes": "The scale command imperatively updates the spec.replicas field in the Deployment. While this is quick, keep in mind that if you re-apply the original YAML file (which might say replicas: 1), it will revert your changes. In a real declarative workflow, you would edit the YAML file instead.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl set image deploy/web nginx=nginx:1.19",
+    "question": "How do you update the image of container 'nginx' in deployment 'web' to 'nginx:1.19'?",
+    "notes": "This command updates the PodSpec template, which triggers the Deployment controller to create a new ReplicaSet. A RollingUpdate begins immediately. It is crucial to monitor the progress using kubectl rollout status to ensure the new image is successfully pulling and starting.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl rollout undo deploy/web",
+    "question": "Command to undo the last rollout of deployment 'web'?",
+    "notes": "This reverts the Deployment to the previous revision stored in its history. Kubernetes keeps a history of ReplicaSets to facilitate this. You can inspect the history with kubectl rollout history deploy/web   and even rollback to a specific revision using --to-revision=X.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create cm app-config --from-literal=color=blue",
+    "question": "How do you create a ConfigMap named 'app-config' from a literal value 'color=blue'?",
+    "notes": "Imperative creation is faster than writing YAML for simple values. You can use the --from-literal flag multiple times in a single command to add multiple key-value pairs. Be careful with special characters in the value; they may need to be escaped or quoted in your shell.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create secret generic db-secret --from-literal=password=123456",
+    "question": "What is the command to create a Secret named 'db-secret' with a password '123456'?",
+    "notes": "\"Secrets created via CLI are automatically base64 encoded by Kubernetes. It is a common misconception that Secrets are encrypted by default; they are merely encoded. Anyone with API access to view Secrets can decode them (echo \"\"val\"\"\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl top node / kubectl top pod",
+    "question": "How do you manually check the CPU and Memory usage of nodes/pods?",
+    "notes": "This command requires the metrics-server to be installed and running in the cluster. It provides a snapshot of current resource usage. Note that this is not a full monitoring solution (like Prometheus), but it is the source of truth for the Horizontal Pod Autoscaler.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl autoscale deploy api --cpu-percent=50 --min=2 --max=10",
+    "question": "What command creates a HorizontalPodAutoscaler (HPA) for deployment 'api' (cpu 50%, min 2, max 10)?",
+    "notes": "This command creates an HPA resource that automatically scales the number of replicas to maintain an average CPU utilization of 50% across all pods. For this to work, the Deployment MUST have CPU requests defined in its spec, or the HPA cannot calculate the percentage.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl taint nodes node01 gpu=true:NoSchedule",
+    "question": "Command to taint node 'node01' with 'gpu=true:NoSchedule'?",
+    "notes": "This applies a restriction to the node. The format is key=value:Effect. NoSchedule means new pods cannot schedule there unless they have a matching toleration. This is commonly used to reserve specialized hardware (like GPUs) or dedicated nodes for specific teams.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl cordon node-1",
+    "question": "Command to mark 'node-1' as unschedulable (maintenance mode)?",
+    "notes": "Cordoning a node adds a SchedulingDisabled taint/status. It prevents new pods from landing there, but existing pods are untouched. This is often the first step in maintenance, followed by draining.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl drain node-1 --ignore-daemonsets",
+    "question": "Command to safely remove all pods from 'node-1' for maintenance?",
+    "notes": "This command first cordons the node, then evicts all pods. You almost always need the --ignore-daemonsets flag because DaemonSet pods rely on the node controller; if evicted, they will immediately try to restart on the same node, causing the drain to fail or hang.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl delete pod bad-pod --force --grace-period=0",
+    "question": "How do you force delete a Pod named 'bad-pod' immediately?",
+    "notes": "\"This sends a SIGKILL immediately, bypassing the default 30-second grace period. This is useful for stuck \"\"Terminating\"\" pods, but dangerous for stateful applications as it creates a risk of data corruption since the app has no time to shut down cleanly.\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pod web -o yaml",
+    "question": "How do you output the YAML of a running pod 'web' without the cluster-specific status fields?",
+    "notes": "kubectl neat",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl expose deploy nginx --port=80 --name=nginx-service",
+    "question": "What is the command to expose a deployment named 'nginx' as a Service on port 80?",
+    "notes": "This creates a ClusterIP service by default. The --port flag specifies the port the Service exposes, while --target-port (optional, defaults to same as port) is the port on the container. Using expose is faster than writing YAML during the exam.  Specify target port if different from container port: kubectl expose deployment nginx --port=80 --target-port=8080  Specify service type (e.g., NodePort): kubectl expose deployment nginx --port=80 --type=NodePort",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pods -n kube-system -l k8s-app=kube-dns",
+    "question": "How do you verify if the CoreDNS pods are running correctly?",
+    "notes": "CoreDNS runs as a Deployment in the kube-system namespace. If DNS fails, check these pods logs (kubectl logs -n kube-system -l k8s-app=kube-dns) or check if the Service kube-dns exists.   kubectl get deployment coredns -n kube-systemkubectl logs -n kube-system -l k8s-app=kube-dnskubectl get svc kube-dns -n kube-systemkubectl run dns-test-128 --image=busybox:1.28 --rm -it --restart=Never -- nslookup kubernetes.default",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pods -o wide --all-namespaces",
+    "question": "What command allows you to view the IP addresses of all pods in the cluster?",
+    "notes": "The -o wide flag reveals the node assignment and the Pod IP. This is useful for verifying that pods are receiving IPs from the expected CIDR range configured in the CNI.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pv --sort-by=.spec.capacity.storage",
+    "question": "How can you list all PersistentVolumes sorted by capacity?",
+    "notes": "Sorting helps quickly identify available volumes that meet a specific size requirement. You can also filter by adding -o wide to see AccessModes and ReclaimPolicy.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl describe pod",
+    "question": "What is the first command to check why a Pod is in 'Pending' state?",
+    "notes": "\"Look at the Events section at the bottom. It usually reveals scheduling issues like \"\"Insufficient cpu/memory,\"\" \"\"Taint/Toleration mismatch,\"\" or \"\"Unbound PersistentVolumeClaim\"\".\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl logs (and -c if multi-container)",
+    "question": "How do you debug a Pod that is running but the application is not behaving correctly?",
+    "notes": "View standard output (stdout/stderr). If logs are missing, you may need to kubectl exec -it  -- sh to inspect files inside the container directly.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl logs --previous",
+    "question": "How do you check the logs of a container that has already crashed and restarted?",
+    "notes": "\"This is critical for CrashLoopBackOff scenarios where the current container is in a \"\"Creating\"\" state and has no logs yet. It shows the output from the last failed instance.\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl describe node",
+    "question": "How do you check for available resources on a node to debug scheduling failures?",
+    "notes": "\"Look at the \"\"Allocatable\"\" vs \"\"Capacity\"\" sections. It shows how much CPU/Memory is actually available for new Pods after reserving resources for system daemons.\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "journalctl -u kubelet",
+    "question": "How do you view the logs of the kubelet service on a node?",
+    "notes": "Essential for troubleshooting NotReady nodes or static pod startup failures. Since the Kubelet runs as a systemd service (not a pod), you cannot use 'kubectl logs'. Use '-f' to follow the logs in real-time or '--since' to limit the time range.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pods -n kube-system",
+    "question": "How do you verify if the Control Plane components (apiserver, scheduler, etc.) are healthy?",
+    "notes": "Most control plane components run as Static Pods in the kube-system namespace. If they are missing or crashing, check their manifest files in /etc/kubernetes/manifests/.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl logs -n kube-system -l k8s-app=kube-dns",
+    "question": "If CoreDNS pods are crashing (CrashLoopBackOff), how do you debug them?",
+    "notes": "Common causes include a loop in the Corefile (forwarding to itself) or network plugin (CNI) failures preventing the pod from getting an IP.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "ETCDCTL_API=3 etcdctl snapshot save",
+    "question": "How do you backup the etcd cluster data?",
+    "notes": "You must provide certificates: --cacert, --cert, and --key. These are usually found in /etc/kubernetes/pki/etcd/.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "ETCDCTL_API=3 etcdctl snapshot restore --data-dir",
+    "question": "How do you restore an etcd snapshot?",
+    "notes": "Critical: Restore to a new data directory. Then, update the etcd.yaml static pod manifest (volumes section) to point to this new directory so etcd restarts with the restored data.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl describe pvc",
+    "question": "If a PersistentVolumeClaim (PVC) is stuck in 'Pending', what should you check?",
+    "notes": "\"Look for \"\"Events\"\". Common issues: No PV available with matching accessModes or capacity, or the StorageClass provider is failing to provision a volume.\"",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl debug -it --copy-to=debug-pod --container=debug --image=busybox",
+    "question": "What command allows you to inspect the file system of a crashing container that won't stay running?",
+    "notes": "This creates a copy of the pod with a new sidecar container/shell, allowing you to mount and inspect the volume/files of the crashing container without it exiting immediately.  --target: Adds an ephemeral container to an existing Pod to debug it live.  --copy-to: Creates a new Pod copied from the original for offline debugging.  Feature--target--copy-toDebug typeEphemeral containerNew PodOriginal PodSame PodCopied PodLive state\u2705\u274cCan change config\u274c\u2705Needs ephemeral support\u2705\u274cBest forCrashing containerDeep config debugging",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubeadm certs check-expiration",
+    "question": "How do you check for certificate expiration on the control plane components?",
+    "notes": "If certificates are expired, components like the apiserver and scheduler will fail to communicate. You can renew them with kubeadm certs renew all.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data",
+    "question": "How do you safely drain a node named 'worker-1' that ignores DaemonSets?",
+    "notes": "Standard drain fails if DaemonSets exist (since they can't be rescheduled) or if pods use local emptyDir storage (data loss risk). These flags force the drain.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get events -n dev --sort-by='.lastTimestamp'",
+    "question": "How do you view the events for a specific namespace 'dev' sorted by timestamp?",
+    "notes": "This is useful to see a chronological history of failures (e.g., Scheduling failures -> ImagePullBackOff -> CrashLoopBackOff) in a noisy namespace.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl delete pod --force --grace-period=0",
+    "question": "If a Pod is stuck in 'Terminating' state, how can you force delete it?",
+    "notes": "This bypasses the graceful shutdown. Use this only if the node is down or the Pod is unresponsive; otherwise, it may leave orphaned resources/locks.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "systemctl status containerd (or docker/crio)",
+    "question": "How do you check the status of the container runtime (containerd/docker) on a node?",
+    "notes": "If the runtime is down, Kubelet cannot start any containers. crictl ps is also useful to list containers at the runtime level, bypassing Kubernetes.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl logs pod-name -c container-name",
+    "question": "How do you debug a Pod failing with 'Init:CrashLoopBackOff'?",
+    "notes": "The main application won't start until the Init Container succeeds. You must explicitly request the logs of the init container to see why it failed (e.g., failed to reach a DB).",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "etcdctl endpoint health",
+    "question": "What is the command to verify the health of the etcd cluster members?",
+    "notes": "Requires cert flags. This confirms if all etcd members are healthy and participating in the quorum.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "crictl ps",
+    "question": "How do you list containers on a node directly via the container runtime interface?",
+    "notes": "Useful for debugging when the API server is down or checking static pods directly on the node. This command bypasses the Kubernetes API and talks directly to the container runtime (like containerd or CRI-O). It lists running containers, their IDs, and status, which is critical when the Kubelet is unresponsive.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "systemctl restart kubelet",
+    "question": "What is the command to restart the kubelet service?",
+    "notes": "Run this after modifying /var/lib/kubelet/config.yaml or if the kubelet has crashed. This is a standard systemd command required because the Kubelet manages the node's state. Restarting triggers the Kubelet to re-read its configuration and manifests.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl run redis --image=redis --restart=Never",
+    "question": "How do you create a pod named 'redis' with image 'redis' imperatively?",
+    "notes": "Use --restart=Never to create a Pod, otherwise it creates a Deployment (in older versions) or is just good practice to be explicit. 'kubectl run' creates a standalone Pod resource. Without '--restart=Never', previous versions might create a deployment, though recent versions default to Pod.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create deploy <name> --image=<image> --replicas=3 --dry-run=client -o yaml",
+    "question": "How do you generate a Deployment YAML without creating it?",
+    "notes": "The fastest way to get a manifest template related to deployments. '--dry-run=client' validates the command locally without sending it to the server. '-o yaml' outputs the resource definition to stdout, which you can redirect to a file.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl describe node <node-name>",
+    "question": "How do you view the Taints applied to a node?",
+    "notes": "grep Taint",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl taint nodes <node-name> key=value:NoSchedule",
+    "question": "Command to Apply a taint to a node?",
+    "notes": "Effects include NoSchedule, PreferNoSchedule, and NoExecute. The syntax is 'key=value:Effect'. If no value is needed, 'key:Effect' works too. Taints ensure only Pods with a matching Toleration can land on this node.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl taint nodes <node-name> key:NoSchedule-",
+    "question": "How do you remove a taint from a node?",
+    "notes": "Appending a minus (-) at the end removes the taint. This syntax tells Kubernetes to delete the specific taint with key 'key' and effect 'NoSchedule'. Essential for making a node schedulable again after dedicated maintenance or debugging.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get nodes --show-labels",
+    "question": "How do you view the labels attached to all nodes?",
+    "notes": "Useful for verifying nodeSelector or affinity matching. The '--show-labels' flag adds an extra column to the output displaying all labels. This is faster than describing each node individually when checking cluster topology.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl label nodes <node-name> <key>=<value>",
+    "question": "Command to Label a node?",
+    "notes": "Labels are used for nodeSelector and affinity. This adds a key-value pair to the node's metadata. To overwrite an existing label, you must add the '--overwrite' flag.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl scale deployment web --replicas=5",
+    "question": "How do you scale a deployment named 'web' to 5 replicas?",
+    "notes": "Imperative command to scale resources. Can also edit the spec.replicas field. This updates the 'replicas' field in the Deployment spec immediately. Works for Deployments, ReplicaSets, and StatefulSets.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl rollout restart deployment <name>",
+    "question": "How do you force a rollout restart of a deployment?",
+    "notes": "Useful to reload configmaps or secrets without changing the pod spec directly. It triggers a new rollout by updating the pod template's metadata/annotations. This ensures that pods pick up changes in referenced external resources.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl rollout history deployment <deployment-name>",
+    "question": "How do you view the history of a rollout?",
+    "notes": "Shows revisions. Specific revisions can be seen with --revision=N. It lists the revision number and the CHANGE-CAUSE (if recorded). Essential for identifying which revision to rollback to in case of failure.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get netpol -n <namespace>",
+    "question": "How do you list all Network Policies in a namespace?",
+    "notes": "Network policies control traffic flow. Default is allow-all, but adding one can isolate pods. This lists the policy names; use 'describe' or '-o yaml' to see the ingress/egress rules. If no policies exist, all traffic is allowed between pods by default.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl describe service <service-name>",
+    "question": "How do you view the Endpoints of a Service?",
+    "notes": "Check the Endpoints row. If <none>, the service selector doesn't match any pods. Endpoints are the IPs of the backing Pods that the Service routes traffic to. This is the first place to check if a Service is not reaching its targets.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get cm coredns -n kube-system -o yaml",
+    "question": "How do you verify the DNS configuration (Corefile)?",
+    "notes": "CoreDNS config is stored in a ConfigMap. Look for forward plugin for upstream resolution. The 'Corefile' key inside the ConfigMap contains the server configuration. Modifying this allows you to add custom stub domains or change upstream DNS servers.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl expose deployment webapp --name=frontend --port=80 --target-port=8080 --type=NodePort",
+    "question": "How do you create a Service 'frontend' exposing a deployment 'webapp' on port 80?",
+    "notes": "Creates a service matching the deployment's labels. '--port' is the port on the Service, '--target-port' is the port on the container. '--type=NodePort' opens a port on every node in the cluster to access the service.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pods --all-namespaces -o=custom-columns=NAME:.metadata.name,PVC:.spec.volumes[].persistentVolumeClaim.claimName",
+    "question": "How do you check which pods are using a specific PersistentVolumeClaim?",
+    "notes": "Advanced filtering to see PVC usage or just describe pod if you know the pod. This custom-column command iterates through all pods and extracts the claimName. Useful for identifying which pods are binding specific storage volumes.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get csr",
+    "question": "How do you check the status of CSRs (CertificateSigningRequests)?",
+    "notes": "Check for Pending, Approved, or Denied. CSRs are used for bootstrapping node certificates or user authentication. A 'Pending' state means the request is waiting for manual approval or an auto-approver.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl certificate approve <csr-name>",
+    "question": "How do you approve a CSR?",
+    "notes": "Required when adding new nodes or users with certificates. This command signs the request using the cluster's CA. Once approved, the certificate is issued and available in the CSR status.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create role dev-role --verb= --resource=pods -n <namespace>",
+    "question": "How do you create a Role named 'dev-role' with full access to pods?",
+    "notes": "Roles are namespaced. Use ClusterRole for cluster-wide permissions. '--verb=*' grants all actions (get, list, create, delete, etc.). '--resource=pods' scopes the permission to Pod resources only.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create rolebinding dev-binding --role=dev-role --user=daily-user -n <namespace>",
+    "question": "How do you bind a Role to a User?",
+    "notes": "Links permissions (Role) to identity (User/SA). A RoleBinding applies the permissions defined in 'dev-role' to the user 'daily-user'. This binding is specific to the namespace defined by '-n'.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl auth can-i create pods --as=daily-user -n <namespace>",
+    "question": "How do you check permissions for a specific user?",
+    "notes": "Verify RBAC setup without logging in as that user. This acts as a 'dry-run' for authorization checks. It returns 'yes' or 'no', helping to debug RBAC policies quickly.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubeadm upgrade plan; kubeadm upgrade apply <version>",
+    "question": "How do you upgrade a cluster using kubeadm?",
+    "notes": "Run on control plane. Workers act differently (kubeadm upgrade node).  'plan' checks available versions and compatibility;  'apply' performs the actual upgrade.   This updates the control plane components (apiserver, controller-manager, scheduler).",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl drain <node-name> --ignore-daemonsets",
+    "question": "How do you drain a node for maintenance?",
+    "notes": "Evicts all pods safely. Use --ignore-daemonsets to bypass DS controller pods. This cordons the node (unschedulable) and evicts pods to other nodes. DaemonSet pods cannot be moved, so the flag is required to proceed.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl uncordon <node-name>",
+    "question": "How do you uncordon a node?",
+    "notes": "Marks node as schedulable again after maintenance. It removes the 'SchedulingDisabled' status from the node. The scheduler will immediately start considering this node for new Pods.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl cluster-info",
+    "question": "How do you view the cluster info and master endpoint?",
+    "notes": "Quick check for API server connectivity and core component URLs. Displays the control plane URL and CoreDNS service address. Useful to verify that your kubeconfig is pointing to the correct cluster.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl set image deployment/<deploy-name> <container-name>=<new-image>",
+    "question": "How do you set a specific image for a container in a deployment?",
+    "notes": "Triggers a rolling update. Updates the image field in the Pod template of the Deployment. This is an imperative way to update applications without editing YAML files.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl run tmp-shell --rm -it --image=busybox -- sh",
+    "question": "How do you run a temporary busybox pod for network debugging?",
+    "notes": "--rm deletes it on exit. Useful for nslookup or wget. '-it' gives you an interactive terminal inside the container. Using 'sh' overrides the default entrypoint to give you a shell immediately.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get all -n <namespace>",
+    "question": "How do you list all resources in a namespace?",
+    "notes": "Lists pods, deployments, services, replicasets, etc. Note: It does not list absolutely everything (e.g., ConfigMaps, Secrets are excluded). It gives a high-level overview of the workloads in the namespace.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pods --sort-by='.status.containerStatuses[0].restartCount'",
+    "question": "How do you sort pods by restart count?",
+    "notes": "Helpful to quickly identify unstable pods. Uses JSONPath to access the restartCount field inside containerStatuses. Pods with high restarts will appear at the bottom of the list.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get node <node> -o jsonpath='{.spec.podCIDR}'",
+    "question": "How do you get the PodCIDR of a specific node?",
+    "notes": "Critical for troubleshooting CNI or networking issues. Extracts the IP range assigned to the node for allocating Pod IPs. If this is missing, the CNI plugin may fail to schedule pods on this node.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl run nginx-pod --image=nginx --restart=Never --dry-run=client -o yaml",
+    "question": "What command creates a NGINX Pod named 'nginx-pod' and generates the YAML without creating it?",
+    "notes": "This is the standard way to generate a Pod manifest template. '--dry-run=client' prevents actual creation. '--restart=Never' ensures it is a Pod, not a Deployment.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl rollout undo deployment/web",
+    "question": "What command rolls back deployment 'web' to the previous version?",
+    "notes": "This reverts the deployment to the immediate previous revision. It updates the Deployment to use the Pod template from the previous revision. Use '--to-revision=X' if you need to go back further than one step.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl delete pod error-pod --force --grace-period=0",
+    "question": "How do you force delete a Pod named 'error-pod' immediately?",
+    "notes": "Useful for stuck Terminating pods. Bypasses the graceful termination period (SIGTERM) and sends SIGKILL. Removes the API object immediately; useful when nodes are down.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl api-resources --namespaced=false",
+    "question": "What command lists all resources in the cluster that are NOT namespaced?",
+    "notes": "Useful to discover cluster-wide resources like Nodes, PVs, ClusterRoles, and StorageClasses. Helps identify which resources do not belong to any specific namespace. Great for exam questions asking about cluster-scoped objects.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,daemonsets",
+    "question": "How do you create a ClusterRole named 'deployment-clusterrole' with create permissions for deployments and daemonsets?",
+    "notes": "Imperative creation of RBAC rules is much faster than writing YAML. ClusterRoles apply globally to the entire cluster. Multiple resources can be specified in a comma-separated list.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl auth can-i list pods --as david -n dev",
+    "question": "How do you check if user 'david' can list pods in namespace 'dev'?",
+    "notes": "This command verifies RBAC permissions. '--as' impersonates the user for the check. Returns 'yes' or 'no' based on the ClusterRoles and Roles bound to 'david'.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create serviceaccount cicd-token -n app-team1",
+    "question": "How do you create a ServiceAccount named 'cicd-token' in namespace 'app-team1'?",
+    "notes": "ServiceAccounts are used by Pods to authenticate with the API server. It automatically creates a simplified token (or links to a Secret in older versions). Essential for configuring workloads that need specific API permissions.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl config use-context research",
+    "question": "What command changes the current kubeconfig context to 'research'?",
+    "notes": "Essential for switching between clusters or user contexts during the exam. Modifies the 'current-context' in your local .kube/config file. Ensures subsequent commands run against the correct cluster/user pair.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "helm repo add bitnami https://charts.bitnami.com/bitnami",
+    "question": "How do you add a Helm repository named 'bitnami'?",
+    "notes": "The first step in using Helm. Registers the remote chart repository locally. You usually run 'helm repo update' immediately after this.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "helm list",
+    "question": "How do you list all installed Helm releases in the current namespace?",
+    "notes": "Shows the Release Name, Revision, Status, and Chart version. Add '-A' to see releases across all namespaces. Useful to find the name of a release you want to upgrade or uninstall.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "helm install amaze-surf bitnami/apache",
+    "question": "How do you install a Helm chart 'bitnami/apache' with release name 'amaze-surf'?",
+    "notes": "Installs the package. Creates the Kubernetes resources defined in the chart. Use '--set' to override default values or '-f values.yaml' for configuration.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "helm uninstall happy-browse",
+    "question": "How do you uninstall a Helm release named 'happy-browse'?",
+    "notes": "Removes the release. Deletes all k8s resources associated with the release. Use '--keep-history' if you might want to rollback this deletion later.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "ETCDCTL_API=3 etcdctl snapshot save <path> --cacert=... --cert=... --key=...",
+    "question": "What command takes a snapshot of the etcd database?",
+    "notes": "You MUST provide the trusted-ca-file, cert-file, and key-file found in /etc/kubernetes/manifests/etcd.yaml. Backs up the cluster state. Must be run on a control plane node where etcd is running.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "ETCDCTL_API=3 etcdctl snapshot restore <path> --data-dir <new-dir>",
+    "question": "How do you restore an etcd snapshot to a specific directory?",
+    "notes": "Always restore to a new directory to avoid corrupting the existing data. After restoring, you must update the etcd static pod manifest hostPath to point to this new directory. This effectively rolls back the cluster state to the snapshot time.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get events --sort-by='.lastTimestamp'",
+    "question": "How do you list all events in the 'default' namespace sorted by timestamp?",
+    "notes": "Extremely useful for troubleshooting to see the order of errors. Events are namespaced objects that log state changes and errors. Sorting helps visualize the sequence of failures (e.g., Pulling -> Failed).",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl top pods -A --sort-by=cpu",
+    "question": "What command identifies the pod consuming the most CPU?",
+    "notes": "Requires Metrics Server to be installed in the cluster. Shows current resource usage (CPU/Memory) for all pods. Sorting helps identify 'noisy neighbors' or memory leaks.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl expose deployment frontend --name=frontend-svc --type=NodePort --port=80 --dry-run=client -o yaml",
+    "question": "How do you generate a NodePort Service YAML for a deployment 'frontend' exposing port 80?",
+    "notes": "Using expose automatically sets the correct Label Selectors to match the deployment. '--dry-run' allows you to review the YAML structure before applying. NodePort allows external access via any node's IP address.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create secret generic db-secret --from-literal=password=s3cr3t",
+    "question": "How do you create a generic Secret named 'db-secret' with a password literal?",
+    "notes": "Faster than creating a file and using --from-file. Encodes the literal string into base64 automatically. The secret can then be mounted as an EnvVar or Volume in a Pod.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl create configmap nginx-config --from-file=/opt/nginx.conf",
+    "question": "How do you Create a ConfigMap 'nginx-config' from a file?",
+    "notes": "The filename becomes the key, and the file content becomes the value. Useful for importing entire configuration files into Kubernetes. This ConfigMap can be mounted as a file inside a container.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "systemctl status kubelet",
+    "question": "How do you check the status of the Kubelet service on a node?",
+    "notes": "Kubelet runs as a systemd service, not a Pod. Shows active state, uptime, and recent log snippets. If it is 'inactive' or 'failed', the node will likely be NotReady.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get daemonsets -A",
+    "question": "What command lists all DaemonSets in all namespaces?",
+    "notes": "DaemonSets ensure one pod per node. Commonly used for system components like kube-proxy, CNI plugins, and log collectors. Checking this verifies that system agents are running on all nodes.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl explain pod.spec.containers.livenessProbe",
+    "question": "How do you get the documentation for the 'spec.containers.livenessProbe' field?",
+    "notes": "Essential for finding correct YAML syntax and field names during the exam. Provides the description, type, and required fields for the resource. Reduces the need to browse external documentation.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl run -it --rm debug --image=busybox:1.28 -- restart=Never -- nslookup google.com",
+    "question": "How do you run a temporary busybox pod to debug DNS?",
+    "notes": "Uses busybox:1.28 (known to work best for nslookup). Older busybox versions have a known issue with nslookup timeouts. Tests if the Pod can resolve internal or external DNS names.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl logs <pod-name> -c sidecar",
+    "question": "How do you view logs of a specific container 'sidecar' in a multi-container pod?",
+    "notes": "If you don't specify -c, kubectl will error if there is more than one container. Allows you to isolate logs from the main app vs. the helper sidecar. Critical for debugging multi-container design patterns.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl get pods -o name",
+    "question": "How do you output just the names of all pods in the default namespace?",
+    "notes": "Returns output like pod/nginx, pod/redis. Simplifies scripting and automation. Example: 'kubectl delete $(kubectl get pods -o name)' deletes all pods.",
+    "source": "CKA Prep.txt"
+  },
+  {
+    "command": "kubectl config set-context <context-of-question> --namespace=<namespace-of-question>",
+    "question": "What is the command to run: kubectl config set-context <co...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl config use-context <context-of-question>",
+    "question": "What is the command to run: kubectl config use-context <co...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl config view",
+    "question": "What is the command to run: kubectl config view...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl config view --minify -o jsonpath='{.clusters.cluster.server}'",
+    "question": "What is the command to run: kubectl config view --minify -...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl config current-context",
+    "question": "What is the command to run: kubectl config current-context...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl config set-credentials myuser --client-key=myuser.key --client-certificate=myuser.crt --embed-certs=true",
+    "question": "What is the command to run: kubectl config set-credentials...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl api-resources",
+    "question": "What is the command to run: kubectl api-resources...?",
+    "notes": "Executes: kubectl api-resources.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl drain <node-name> --ignore-daemonsets --force",
+    "question": "What is the command to run: kubectl drain <node-name> --ig...?",
+    "notes": "Safely evicts all pods from a node for maintenance.\nUse '--ignore-daemonsets' to proceed if DaemonSets exist.\nMarks the node as unschedulable (cordon).",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl run frontend --image=nginx:1.24.0 --port=80",
+    "question": "What is the command to run: kubectl run frontend --image=n...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl run frontend --image=nginx:1.25.1 --port=80 -o yaml --dry-run=client > pod.yaml",
+    "question": "What is the command to run: kubectl run frontend --image=n...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl run busybox --image=busybox:1.36.1 --restart=Never --rm -it -n j43 -- wget -O- 10.1.0.66:80",
+    "question": "What is the command to run: kubectl run busybox --image=bu...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl run nginx --image=nginx:1.27.4-alpine",
+    "question": "What is the command to run: kubectl run nginx --image=ngin...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl run operator --image=nginx:1.21.1 --restart=Never --port=80 --serviceaccount=api-access -n apps",
+    "question": "What is the command to run: kubectl run operator --image=n...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create deployment myapp --image=:1.25.2 --port=80 --replicas=2",
+    "question": "Command to create deployment?",
+    "notes": "Creates a Deployment to manage stateless apps.\nAutomatically manages ReplicaSets and Pods.\nPreferred over creating bare Pods for production.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl delete pod frontend",
+    "question": "Command to delete pod?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl delete pod nginx --now",
+    "question": "Command to delete pod?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl delete deployment myapp",
+    "question": "Command to delete deployment?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl scale deployment nginx --replicas=5",
+    "question": "Command to scale deployment?",
+    "notes": "Updates the replica count of a controller.\nWorks for Deployments, ReplicaSets, and StatefulSets.\nImperative scaling; generally prefer HPA for auto-scaling.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl set image deployment/nginx nginx=nginx:1.23.4",
+    "question": "What is the command to run: kubectl set image deployment/n...?",
+    "notes": "Executes: kubectl set image deployment/nginx nginx=nginx:1.23.4.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl rollout history deployment nginx",
+    "question": "Command to manage rollout of history?",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl rollout undo deployment/nginx --to-revision=1",
+    "question": "Command to manage rollout of undo?",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl edit pod frontend",
+    "question": "Command to edit pod?",
+    "notes": "Executes: kubectl edit pod frontend.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl patch pod frontend -p '...'",
+    "question": "Command to patch pod?",
+    "notes": "Executes: kubectl patch pod frontend -p '...'.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl annotate deployment nginx kubernetes.io/change-cause=\"Pick up patch version\"",
+    "question": "Command to annotate deployment?",
+    "notes": "Executes: kubectl annotate deployment nginx kubernetes.io/change-cause=\"Pick up patch version\".\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl port-forward service/prometheus-operated 8080:9090",
+    "question": "What is the command to run: kubectl port-forward service/p...?",
+    "notes": "Executes: kubectl port-forward service/prometheus-operated 8080:9090.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl exec -it nginx --namespace=j43 -- /bin/sh",
+    "question": "What is the command to run: kubectl exec -it nginx --names...?",
+    "notes": "Executes a command inside a running container.\nCommonly used with '-it -- /bin/sh' for interactive shell.\nAllows direct file inspection and network testing.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl logs list-objects -c pods -n k97",
+    "question": "What is the command to run: kubectl logs list-objects -c p...?",
+    "notes": "Fetches logs from a container in a Pod.\nUse '-p' for previous instance logs or '-f' to follow.\nVital for application debugging.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get pods -n kube-flannel",
+    "question": "Command to list or get details of pods?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get pod web-app -o yaml",
+    "question": "Command to list or get details of pod?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get all",
+    "question": "Command to list or get details of all?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get deployments",
+    "question": "Command to list or get details of deployments?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get replicasets",
+    "question": "Command to list or get details of replicasets?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get service prometheus-operated",
+    "question": "Command to list or get details of service?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get serviceaccounts",
+    "question": "Command to list or get details of serviceaccounts?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get hpa nginx-hpa",
+    "question": "Command to list or get details of hpa?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe pvc my-claim",
+    "question": "Command to show details of pvc?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe pod etcd-kube-control-plane -n kube-system",
+    "question": "Command to show details of pod?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe application nginx",
+    "question": "Command to show details of application?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl apply -f nginx-deployment.yaml",
+    "question": "Command to apply configuration for -f?",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl apply -f app-stack/",
+    "question": "Command to apply configuration for -f?",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl apply -f web-app/ -R",
+    "question": "Command to apply configuration for -f?",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl apply -f https://raw.githubusercontent.com/...",
+    "question": "Command to apply configuration for -f?",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create -f https://operatorhub.io/install/argocd-operator.yaml",
+    "question": "Command to create -f?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl delete -f nginx-deployment.yaml",
+    "question": "Command to delete -f?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create role read-only --verb=list,get,watch --resource=pods,deployments,services",
+    "question": "Command to create role?",
+    "notes": "Creates a Deployment to manage stateless apps.\nAutomatically manages ReplicaSets and Pods.\nPreferred over creating bare Pods for production.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get roles",
+    "question": "Command to list or get details of roles?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe role read-only",
+    "question": "Command to show details of role?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create rolebinding read-only-binding --role=read-only --user=bmuschko",
+    "question": "Command to create rolebinding?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get rolebindings",
+    "question": "Command to list or get details of rolebindings?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe rolebinding read-only-binding",
+    "question": "Command to show details of rolebinding?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create clusterrole service-view --verb=get,list --resource=services",
+    "question": "Command to create clusterrole?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create clusterrole combined --aggregation-rule=\"rbac.cka.cncf.com/aggregate=true\"",
+    "question": "Command to create clusterrole?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create clusterrolebinding api-clusterrolebinding --serviceaccount=apps:api-access --clusterrole=api-clusterrole",
+    "question": "Command to create clusterrolebinding?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe clusterroles pods-services-aggregation-rules -n rbac-example",
+    "question": "Command to show details of clusterroles?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create serviceaccount cicd-bot",
+    "question": "Command to create serviceaccount?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl auth can-i --list --as bmuschko",
+    "question": "What is the command to run: kubectl auth can-i --list --as...?",
+    "notes": "Checks RBAC permissions.\nUse 'can-i' to verify if a user/serviceaccount can perform actions.\nGreat for debugging 'Forbidden' errors.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl auth can-i list pods --as bmuschko",
+    "question": "What is the command to run: kubectl auth can-i list pods -...?",
+    "notes": "Checks RBAC permissions.\nUse 'can-i' to verify if a user/serviceaccount can perform actions.\nGreat for debugging 'Forbidden' errors.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get secret db-credentials -o yaml",
+    "question": "Command to list or get details of secret?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create configmap app-config --from-file=application.yaml",
+    "question": "Command to create configmap?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get configmap app-config -o yaml",
+    "question": "Command to list or get details of configmap?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create secret generic db-credentials --from-literal=db-password=passwd",
+    "question": "Command to create secret?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl create ns kube-flannel",
+    "question": "Command to create ns?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged",
+    "question": "Command to label --overwrite?",
+    "notes": "Updates labels on a resource.\nLabels are used for selectors by Services and Deployments.\nUse '--overwrite' to change an existing label.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl delete namespace j43",
+    "question": "Command to delete namespace?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl kustomize <target>",
+    "question": "What is the command to run: kubectl kustomize <target>...?",
+    "notes": "Executes: kubectl kustomize <target>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl apply -k <target>",
+    "question": "Command to apply configuration for -k?",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get csv -n operators",
+    "question": "Command to list or get details of csv?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get crds",
+    "question": "Command to list or get details of crds?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe crd applications.argoproj.io",
+    "question": "Command to show details of crd?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get crd backups.example.com",
+    "question": "Command to list or get details of crd?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl get backups",
+    "question": "Command to list or get details of backups?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl describe backup nginx-backup",
+    "question": "Command to show details of backup?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm init --pod-network-cidr=10.244.0.0/16",
+    "question": "What is the command to run: kubeadm init --pod-network-cid...?",
+    "notes": "Executes: kubeadm init --pod-network-cidr=10.244.0.0/16.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm token create --print-join-command",
+    "question": "What is the command to run: kubeadm token create --print-j...?",
+    "notes": "Executes: kubeadm token create --print-join-command.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm join 172.16.0.5:6443 --token ... --discovery-token-ca-cert-hash ...",
+    "question": "What is the command to run: kubeadm join 172.16.0.5:6443 -...?",
+    "notes": "Executes: kubeadm join 172.16.0.5:6443 --token ... --discovery-token-ca-cert-hash ....\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm version",
+    "question": "What is the command to run: kubeadm version...?",
+    "notes": "Executes: kubeadm version.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm upgrade plan",
+    "question": "What is the command to run: kubeadm upgrade plan...?",
+    "notes": "Executes: kubeadm upgrade plan.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm upgrade apply v1.31.5",
+    "question": "What is the command to run: kubeadm upgrade apply v1.31.5...?",
+    "notes": "Executes: kubeadm upgrade apply v1.31.5.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubeadm upgrade node",
+    "question": "What is the command to run: kubeadm upgrade node...?",
+    "notes": "Executes: kubeadm upgrade node.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm repo add jenkinsci https://charts.jenkins.io/",
+    "question": "Command to manage helm repositories (add)?",
+    "notes": "Manages chart repositories.\n'add' to register, 'update' to sync index.\nPrerequisite for installing third-party charts.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm repo list",
+    "question": "Command to manage helm repositories (list)?",
+    "notes": "Manages chart repositories.\n'add' to register, 'update' to sync index.\nPrerequisite for installing third-party charts.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm search repo jenkinsci",
+    "question": "What is the command to run: helm search repo jenkinsci...?",
+    "notes": "Executes: helm search repo jenkinsci.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm install my-jenkins jenkinsci/jenkins --version 5.8.25",
+    "question": "Command to install a helm chart?",
+    "notes": "Installs a chart archive.\nDeploys packages to Kubernetes with versioning.\nUse '--set' or '-f' to customize values.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm show values jenkinsci/jenkins",
+    "question": "What is the command to run: helm show values jenkinsci/jen...?",
+    "notes": "Executes: helm show values jenkinsci/jenkins.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm list --all-namespaces",
+    "question": "Command to list helm releases?",
+    "notes": "Lists all releases in the current namespace.\nShows status (deployed/failed) and revision.\nUse '-A' for all namespaces.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm repo update",
+    "question": "Command to manage helm repositories (update)?",
+    "notes": "Manages chart repositories.\n'add' to register, 'update' to sync index.\nPrerequisite for installing third-party charts.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm upgrade my-jenkins jenkinsci/jenkins --version 5.8.26",
+    "question": "What is the command to run: helm upgrade my-jenkins jenkin...?",
+    "notes": "Executes: helm upgrade my-jenkins jenkinsci/jenkins --version 5.8.26.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm uninstall my-jenkins",
+    "question": "Command to uninstall a helm release?",
+    "notes": "Executes: helm uninstall my-jenkins.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "helm search hub prometheus-community",
+    "question": "What is the command to run: helm search hub prometheus-com...?",
+    "notes": "Executes: helm search hub prometheus-community.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "etcdctl version",
+    "question": "What is the command to run: etcdctl version...?",
+    "notes": "Command line client for etcd.\nUsed for taking snapshots (backup) and restoring data.\nRequires certificate authentication paths.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "etcdctl --cacert=... --cert=... --key=... snapshot save /opt/etcd-backup.db",
+    "question": "What is the command to run: etcdctl --cacert=... --cert=.....?",
+    "notes": "Command line client for etcd.\nUsed for taking snapshots (backup) and restoring data.\nRequires certificate authentication paths.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "etcdutl --data-dir=/var/lib/from-backup snapshot restore /opt/etcd-backup.db",
+    "question": "What is the command to run: etcdutl --data-dir=/var/lib/fr...?",
+    "notes": "Executes: etcdutl --data-dir=/var/lib/from-backup snapshot restore /opt/etcd-backup.db.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "alias k=kubectl",
+    "question": "What is the command to run: alias k=kubectl...?",
+    "notes": "Executes: alias k=kubectl.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "cka-commands.txt"
+  },
+  {
+    "command": "kubectl config set-context <context> --namespace=<namespace>",
+    "question": "What is the command to run: kubectl config set-context <co...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl config use-context <context>",
+    "question": "What is the command to run: kubectl config use-context <co...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl config set-credentials ...",
+    "question": "What is the command to run: kubectl config set-credentials...?",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl run <name> --image=<image> --port=<port>",
+    "question": "What is the command to run: kubectl run <name> --image=<im...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl run <name> ... --dry-run=client -o yaml > pod.yaml",
+    "question": "What is the command to run: kubectl run <name> ... --dry-r...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl run <name> ... --labels=<key>=<value>",
+    "question": "What is the command to run: kubectl run <name> ... --label...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl run <name> ... --env=\"<key>=<value>\"",
+    "question": "What is the command to run: kubectl run <name> ... --env=\"...?",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl delete pod <name> --now",
+    "question": "Command to delete pod?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create deployment <name> --image=<image> --replicas=<n>",
+    "question": "Command to create deployment?",
+    "notes": "Creates a Deployment to manage stateless apps.\nAutomatically manages ReplicaSets and Pods.\nPreferred over creating bare Pods for production.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl scale deployment <name> --replicas=<n>",
+    "question": "Command to scale deployment?",
+    "notes": "Updates the replica count of a controller.\nWorks for Deployments, ReplicaSets, and StatefulSets.\nImperative scaling; generally prefer HPA for auto-scaling.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl set image deployment <name> <container>=<image>",
+    "question": "What is the command to run: kubectl set image deployment <...?",
+    "notes": "Executes: kubectl set image deployment <name> <container>=<image>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl rollout status deployment <name>",
+    "question": "Command to manage rollout of status?",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl rollout history deployment <name>",
+    "question": "Command to manage rollout of history?",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl rollout undo deployment <name> --to-revision=<n>",
+    "question": "Command to manage rollout of undo?",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl autoscale deployment <name> --cpu-percent=<n> --min=<n> --max=<n>",
+    "question": "Command to autoscale deployment?",
+    "notes": "Executes: kubectl autoscale deployment <name> --cpu-percent=<n> --min=<n> --max=<n>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create service clusterip <name> --tcp=<port>:<targetPort>",
+    "question": "Command to create service?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create service nodeport <name> --tcp=<port>:<targetPort>",
+    "question": "Command to create service?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create service loadbalancer <name> --tcp=<port>:<targetPort>",
+    "question": "Command to create service?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl expose deployment <name> --port=<port> --target-port=<port>",
+    "question": "Command to expose deployment?",
+    "notes": "Executes: kubectl expose deployment <name> --port=<port> --target-port=<port>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create ingress <name> --rule=\"<host>/<path>=<service>:<port>\"",
+    "question": "Command to create ingress?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create job <name> --image=<image> -- <command>",
+    "question": "Command to create job?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create cronjob <name> --schedule=\"<cron>\" --image=<image> ...",
+    "question": "Command to create cronjob?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create configmap <name> --from-literal=<key>=<value>",
+    "question": "Command to create configmap?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create configmap <name> --from-file=<file>",
+    "question": "Command to create configmap?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create secret generic <name> --from-literal=<key>=<value>",
+    "question": "Command to create secret?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create secret generic <name> --from-file=<file> --type=kubernetes.io/ssh-auth",
+    "question": "Command to create secret?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create serviceaccount <name>",
+    "question": "Command to create serviceaccount?",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create role <name> --verb=<verb> --resource=<resource>",
+    "question": "Command to create role?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl create rolebinding <name> --role=<role> --user=<user>",
+    "question": "Command to create rolebinding?",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl auth can-i --list --as <user>",
+    "question": "What is the command to run: kubectl auth can-i --list --as...?",
+    "notes": "Checks RBAC permissions.\nUse 'can-i' to verify if a user/serviceaccount can perform actions.\nGreat for debugging 'Forbidden' errors.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl apply -f <filename/directory/url>",
+    "question": "Command to apply configuration for -f?",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl delete -f <filename>",
+    "question": "Command to delete -f?",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl replace -f <filename>",
+    "question": "Command to replace -f?",
+    "notes": "Executes: kubectl replace -f <filename>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl edit <resource> <name>",
+    "question": "Command to edit <resource>?",
+    "notes": "Executes: kubectl edit <resource> <name>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl patch <resource> <name> -p <json>",
+    "question": "Command to patch <resource>?",
+    "notes": "Executes: kubectl patch <resource> <name> -p <json>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl label pod <name> <key>=<value>",
+    "question": "Command to label pod?",
+    "notes": "Updates labels on a resource.\nLabels are used for selectors by Services and Deployments.\nUse '--overwrite' to change an existing label.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl annotate pod <name> <key>=<value>",
+    "question": "Command to annotate pod?",
+    "notes": "Executes: kubectl annotate pod <name> <key>=<value>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get pods -o wide",
+    "question": "Command to list or get details of pods?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get pods --show-labels",
+    "question": "Command to list or get details of pods?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get pods -l <selector>",
+    "question": "Command to list or get details of pods?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get services",
+    "question": "Command to list or get details of services?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get endpoints <service>",
+    "question": "Command to list or get details of endpoints?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get ingress",
+    "question": "Command to list or get details of ingress?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get networkpolicy",
+    "question": "Command to list or get details of networkpolicy?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get pv",
+    "question": "Command to list or get details of pv?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get pvc",
+    "question": "Command to list or get details of pvc?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl get events",
+    "question": "Command to list or get details of events?",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl describe pod <name>",
+    "question": "Command to show details of pod?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl describe deployment <name>",
+    "question": "Command to show details of deployment?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl describe service <name>",
+    "question": "Command to show details of service?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl describe ingress <name>",
+    "question": "Command to show details of ingress?",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl logs <name>",
+    "question": "What is the command to run: kubectl logs <name>...?",
+    "notes": "Fetches logs from a container in a Pod.\nUse '-p' for previous instance logs or '-f' to follow.\nVital for application debugging.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl logs <name> -f",
+    "question": "What is the command to run: kubectl logs <name> -f...?",
+    "notes": "Fetches logs from a container in a Pod.\nUse '-p' for previous instance logs or '-f' to follow.\nVital for application debugging.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl logs <name> -c <container>",
+    "question": "What is the command to run: kubectl logs <name> -c <contai...?",
+    "notes": "Fetches logs from a container in a Pod.\nUse '-p' for previous instance logs or '-f' to follow.\nVital for application debugging.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl exec -it <name> -- /bin/sh",
+    "question": "What is the command to run: kubectl exec -it <name> -- /bi...?",
+    "notes": "Executes a command inside a running container.\nCommonly used with '-it -- /bin/sh' for interactive shell.\nAllows direct file inspection and network testing.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl exec <name> -- <command>",
+    "question": "What is the command to run: kubectl exec <name> -- <comman...?",
+    "notes": "Executes a command inside a running container.\nCommonly used with '-it -- /bin/sh' for interactive shell.\nAllows direct file inspection and network testing.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl port-forward <name> <local>:<remote>",
+    "question": "What is the command to run: kubectl port-forward <name> <l...?",
+    "notes": "Executes: kubectl port-forward <name> <local>:<remote>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl top nodes",
+    "question": "What is the command to run: kubectl top nodes...?",
+    "notes": "Displays resource usage (CPU/Memory).\nRequires Metrics Server to be installed.\nUse to identify resource-heavy pods or nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl top pods",
+    "question": "What is the command to run: kubectl top pods...?",
+    "notes": "Displays resource usage (CPU/Memory).\nRequires Metrics Server to be installed.\nUse to identify resource-heavy pods or nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl alpha debug -it <name> --image=<image>",
+    "question": "What is the command to run: kubectl alpha debug -it <name>...?",
+    "notes": "Executes: kubectl alpha debug -it <name> --image=<image>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "kubectl api-versions",
+    "question": "What is the command to run: kubectl api-versions...?",
+    "notes": "Executes: kubectl api-versions.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm repo add <name> <url>",
+    "question": "Command to manage helm repositories (add)?",
+    "notes": "Manages chart repositories.\n'add' to register, 'update' to sync index.\nPrerequisite for installing third-party charts.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm search repo <name>",
+    "question": "What is the command to run: helm search repo <name>...?",
+    "notes": "Executes: helm search repo <name>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm install <release> <chart> --version <version>",
+    "question": "Command to install a helm chart?",
+    "notes": "Installs a chart archive.\nDeploys packages to Kubernetes with versioning.\nUse '--set' or '-f' to customize values.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm install ... --set <key>=<value>",
+    "question": "Command to install a helm chart?",
+    "notes": "Installs a chart archive.\nDeploys packages to Kubernetes with versioning.\nUse '--set' or '-f' to customize values.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm show values <chart>",
+    "question": "What is the command to run: helm show values <chart>...?",
+    "notes": "Executes: helm show values <chart>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm upgrade <release> <chart> --version <version>",
+    "question": "What is the command to run: helm upgrade <release> <chart>...?",
+    "notes": "Executes: helm upgrade <release> <chart> --version <version>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "helm uninstall <release>",
+    "question": "Command to uninstall a helm release?",
+    "notes": "Executes: helm uninstall <release>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker build -t <tag> .",
+    "question": "Docker command to build?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker images",
+    "question": "What is the command to run: docker images...?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker run -d -p <host>:<container> <image>",
+    "question": "Docker command to run?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker container ls",
+    "question": "Docker command to container?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker logs <id>",
+    "question": "Docker command to logs?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker exec -it <id> bash",
+    "question": "Docker command to exec?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker tag <source> <target>",
+    "question": "Docker command to tag?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker push <image>",
+    "question": "Docker command to push?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker save -o <file> <image>",
+    "question": "Docker command to save?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "docker load --input <file>",
+    "question": "Docker command to load?",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes.",
+    "source": "ckad-commands.txt"
+  },
+  {
+    "command": "minikube addons enable metrics-server",
+    "question": "What is the command to run: minikube addons enable metrics...?",
+    "notes": "Executes: minikube addons enable metrics-server.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct.",
+    "source": "ckad-commands.txt"
+  }
+]

@@ -1,0 +1,1262 @@
+[
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you backup the etcd cluster data?",
+    "command": "ETCDCTL_API=3 etcdctl snapshot save /opt/cluster_backup.db \\ --endpoints=https://127.0.0.1:2379 \\ --cacert=/etc/kubernetes/pki/etcd/ca.crt \\ --cert=/etc/kubernetes/pki/etcd/server.crt \\ --key=/etc/kubernetes/pki/etcd/server.key",
+    "notes": "Use 'etcdctl snapshot save <path>'. \nEssential flags: --cacert, --cert, --key, --endpoints. \nRun this on the control plane node."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you restore an etcd cluster from a snapshot?",
+    "command": "ETCDCTL_API=3 etcdctl snapshot restore <path> --data-dir <new-dir>",
+    "notes": "Use 'etcdctl snapshot restore <path> --data-dir <new-dir>'. \nAfter restore, update the etcd static pod manifest 'hostPath' to point to the new data directory."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you check the health of etcd cluster members?",
+    "command": "etcdctl endpoint health",
+    "notes": "Use 'etcdctl endpoint health'. \nRequires the same TLS certificate flags as other commands to authenticate with the members."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you check available versions before upgrading a cluster?",
+    "command": "kubeadm upgrade plan; kubeadm upgrade apply <version>",
+    "notes": "Run 'kubeadm upgrade plan'. \nIt checks the current version and lists available upgrades for the control plane components."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you apply a specific version upgrade to the control plane?",
+    "command": "kubeadm upgrade apply v1.31.5",
+    "notes": "Run 'kubeadm upgrade apply <version>'. \nThis upgrades the API Server, Controller Manager, and Scheduler on the control plane node."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you generate a new join token for worker nodes?",
+    "command": "kubeadm token create --print-join-command",
+    "notes": "Use 'kubeadm token create --print-join-command'. \nGenerates the full 'kubeadm join' command with the token and CA hash needed for a worker to join."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you safely remove all workloads from a node for maintenance?",
+    "command": "kubectl drain worker-1 --ignore-daemonsets --delete-emptydir-data",
+    "notes": "Use 'kubectl drain <node> --ignore-daemonsets'. \nCordons the node and evicts pods. --ignore-daemonsets is required for system pods."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you make a node schedulable again after maintenance?",
+    "command": "kubectl uncordon <node-name>",
+    "notes": "Use 'kubectl uncordon <node>'. \nRemoves the SchedulingDisabled taint so new pods can be placed on the node."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you imperatively create a single Pod?",
+    "command": "kubectl run operator --image=nginx:1.21.1 --restart=Never --port=80 --serviceaccount=api-access -n apps",
+    "notes": "Use 'kubectl run <name> --image=<imgRef> --restart=Never'. \nGreat for quick tests or debugging tools. Add '--dry-run=client -o yaml' to generate a manifest."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you generate a Pod YAML without creating it?",
+    "command": "kubectl run frontend --image=nginx:1.25.1 --port=80 -o yaml --dry-run=client > pod.yaml",
+    "notes": "Use 'kubectl run <name> --image=<imgRef> --dry-run=client -o yaml'. \nStandard way to create a template manifest during the exam."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you imperatively create a Deployment with specific replicas?",
+    "command": "kubectl create deployment myapp --image=:1.25.2 --port=80 --replicas=2",
+    "notes": "Use 'kubectl create deployment <name> --image=<imgRef> --replicas=<N>'. \nFastest way to spin up a stateless application."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you scale an existing deployment?",
+    "command": "kubectl scale deployment <name> --replicas=<n>",
+    "notes": "Use 'kubectl scale deployment <name> --replicas=<N>'. \nImmediate imperative scaling. For declarative scaling, edit the YAML spec.replicas field."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you update the image of a running deployment?",
+    "command": "kubectl set image deployment/ = or by applying an updated manifest file with kubectl apply -f .",
+    "notes": "Use 'kubectl set image deployment/<name> <container>=<new-image>'. \nTriggers a rolling update. Monitor with 'kubectl rollout status'."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you rollback a deployment to the previous version?",
+    "command": "kubectl rollout undo deployment <name> --to-revision=<n>",
+    "notes": "Use 'kubectl rollout undo deployment/<name>'. \nReverts to the revision immediately preceding the current one. Use '--to-revision' for specific versions."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you taint a node to restrict scheduling?",
+    "command": "kubectl taint nodes <node-name> key=value:NoSchedule",
+    "notes": "Use 'kubectl taint nodes <node> key=value:NoSchedule'. \nOnly pods with a matching toleration can be scheduled on this node."
+  },
+  {
+    "section": "Workloads & Scheduling",
+    "question": "How do you add a label to a node?",
+    "command": "kubectl label nodes <node-name> <key>=<value>",
+    "notes": "Use 'kubectl label nodes <node> <key>=<value>'. \nLabels are used by nodeSelectors and Affinity rules to control pod placement."
+  },
+  {
+    "section": "Services & Networking",
+    "question": "How do you expose a deployment as a Service?",
+    "command": "kubectl expose deployment frontend --name=frontend-svc --type=NodePort --port=80 --dry-run=client -o yaml",
+    "notes": "Use 'kubectl expose deployment <name> --port=<svc-port> --target-port=<pod-port>'. \nCreates a ClusterIP by default. Use '--type=NodePort' for external node access."
+  },
+  {
+    "section": "Services & Networking",
+    "question": "How do you list Services and their ClusterIP/Ports?",
+    "command": "kubectl get services",
+    "notes": "Use 'kubectl get services'. \nShows the Service type (ClusterIP/NodePort) and the exposed ports."
+  },
+  {
+    "section": "Services & Networking",
+    "question": "How do you list Ingress resources?",
+    "command": "kubectl get ingress",
+    "notes": "Use 'kubectl get ingress'. \nShows the host rules and backend services associated with ingress routing."
+  },
+  {
+    "section": "Services & Networking",
+    "question": "How do you list Network Policies?",
+    "command": "kubectl get netpol -n <namespace>",
+    "notes": "Use 'kubectl get netpol'. \nNetwork policies control traffic flow between pods. Default is usually allow-all unless restricted."
+  },
+  {
+    "section": "Services & Networking",
+    "question": "How do you debug DNS resolution from within the cluster?",
+    "command": "kubectl run -it --rm debug --image=busybox:1.28 -- restart=Never -- nslookup google.com",
+    "notes": "Use 'kubectl run tmp --image=busybox:1.28 --rm -it -- nslookup <target>'. \nTest if a pod can resolve a service name or an external domain."
+  },
+  {
+    "section": "Storage",
+    "question": "How do you list Persistent Volumes?",
+    "command": "kubectl get pv --sort-by=.spec.capacity.storage",
+    "notes": "Use 'kubectl get pv'. \nShows available volumes, capacity, and status (Available/Bound). Sort by capacity with '--sort-by=.spec.capacity.storage'."
+  },
+  {
+    "section": "Storage",
+    "question": "How do you list Persistent Volume Claims?",
+    "command": "kubectl get pvc",
+    "notes": "Use 'kubectl get pvc'. \nShows which claims are bound to which volumes. A 'Pending' status often indicates no matching PV is available."
+  },
+  {
+    "section": "Storage",
+    "question": "How do you debug a PVC stuck in Pending state?",
+    "command": "kubectl describe pvc my-claim",
+    "notes": "Use 'kubectl describe pvc <name>'. \nCheck the 'Events' section. Common causes: No default storage class, size mismatch, or selector mismatch."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you check logs for a crashed/restarted container?",
+    "command": "kubectl logs --previous",
+    "notes": "Use 'kubectl logs <pod> --previous'. \nShows the stdout/stderr of the last crashed instance. Critical for debugging CrashLoopBackOff."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you get logs from a specific container in a multi-container pod?",
+    "command": "kubectl logs (and -c if multi-container)",
+    "notes": "Use 'kubectl logs <pod> -c <container>'. \nRequired when a pod has a sidecar or init-container."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you check node resource usage (CPU/Mem)?",
+    "command": "kubectl top node and kubectl top pod.",
+    "notes": "Use 'kubectl top node'. \nRequires metrics-server. Identifies nodes under pressure or with high load."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you check pod resource usage?",
+    "command": "kubectl top pods --all-namespaces --sort-by=cpu",
+    "notes": "Use 'kubectl top pod'. \nUseful to find 'noisy neighbors' consuming excessive CPU/Memory."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you check RBAC permissions for a user?",
+    "command": "kubectl auth can-i create pods --as=daily-user -n <namespace>",
+    "notes": "Use 'kubectl auth can-i <verb> <resource> --as <user>'. \nVerifies if a specific user is authorized to perform an action."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you inspect Kubelet logs on a node?",
+    "command": "journalctl -u kubelet",
+    "notes": "Use 'journalctl -u kubelet'. \nThe Kubelet is a systemd service, so its logs are in the journal, not in kubectl. Essential for debugging 'NotReady' nodes."
+  },
+  {
+    "section": "Troubleshooting",
+    "question": "How do you check running containers directly on the runtime level?",
+    "command": "crictl ps",
+    "notes": "Use 'crictl ps'. \nBypasses the Kubelet API. Useful if the Kubelet is frozen or stopped to see what containers are actually running."
+  },
+  {
+    "section": "Helm & Kustomize",
+    "question": "How do you register a new Helm chart repository?",
+    "command": "helm repo add bitnami https://charts.bitnami.com/bitnami",
+    "notes": "Use 'helm repo add <name> <url>'. \nAdds the upstream chart source. Follow with 'helm repo update'."
+  },
+  {
+    "section": "Helm & Kustomize",
+    "question": "How do you deploy a Helm chart?",
+    "command": "helm install my-jenkins jenkinsci/jenkins --version 5.8.25",
+    "notes": "Use 'helm install <release-name> <chart>'. \nDeploys the application defined in the chart. Use '--set key=val' to override configuration."
+  },
+  {
+    "section": "Helm & Kustomize",
+    "question": "How do you view installed Helm releases?",
+    "command": "helm list --all-namespaces",
+    "notes": "Use 'helm list -A'. \nShows deployed charts across all namespaces, including their revision and status."
+  },
+  {
+    "section": "Helm & Kustomize",
+    "question": "How do you delete a Helm release?",
+    "command": "helm uninstall happy-browse",
+    "notes": "Use 'helm uninstall <name>'. \nRemoves all Kubernetes resources associated with the release."
+  },
+  {
+    "section": "Helm & Kustomize",
+    "question": "How do you render a Kustomize overlay to stdout?",
+    "command": "kubectl kustomize <target>",
+    "notes": "Use 'kubectl kustomize <dir>'. \nBuilds the final manifest from the base and overlay without applying it."
+  },
+  {
+    "section": "Helm & Kustomize",
+    "question": "How do you apply a Kustomize configuration?",
+    "command": "kubectl apply -k <target>",
+    "notes": "Use 'kubectl apply -k <dir>'. \nBuilds and applies the kustomization.yaml found in the directory."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you imperative create a Role?",
+    "command": "kubectl create role read-only --verb=list,get,watch --resource=pods,deployments,services",
+    "notes": "Use 'kubectl create role <name> --verb=<verbs> --resource=<res>'. \nNamespace-scoped permissions."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you imperative create a ClusterRole?",
+    "command": "kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,daemonsets",
+    "notes": "Use 'kubectl create clusterrole <name> --verb=<verbs> --resource=<res>'. \nCluster-wide permissions."
+  },
+  {
+    "section": "Cluster Architecture, Installation & Configuration",
+    "question": "How do you create a ServiceAccount?",
+    "command": "kubectl create serviceaccount cicd-token -n app-team1",
+    "notes": "Use 'kubectl create serviceaccount <name>'. \nIdentity for Pods to talk to the API Server."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you debug DNS resolution issues from within a Pod?",
+    "command": "kubectl exec -it -- nslookup or kubectl exec -it -- curl .",
+    "notes": "If nslookup fails, it points to a problem with CoreDNS.   If nslookup succeeds but curl fails, it might be a network policy or kube-proxy issue."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you get a shell inside a running container?",
+    "command": "kubectl exec -it -c -- /bin/sh",
+    "notes": "This is an essential command for debugging running applications. If the container doesn't have /bin/sh, try /bin/bash."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How can you pause and resume a Deployment rollout?",
+    "command": "kubectl rollout pause deployment/ and kubectl rollout resume deployment/.",
+    "notes": "Pausing a deployment allows you to make multiple changes to the Deployment object before a new rollout is triggered."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you get the YAML manifest of a running object in the cluster?",
+    "command": "kubectl get -o yaml",
+    "notes": "This is useful for inspecting the current state of an object or for using an existing object as a template for a new one."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you create a ConfigMap from a file?",
+    "command": "kubectl create configmap --from-file=",
+    "notes": "ConfigMaps are used to store non-confidential configuration data as key-value pairs. Pods can consume them as environment variables, command-line arguments, or as configuration files in a volume."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view all events in the cluster?",
+    "command": "kubectl get events --all-namespaces --sort-by='.metadata.creationTimestamp'",
+    "notes": "This command is extremely useful for getting a chronological overview of what has been happening in the cluster, especially when debugging complex issues."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How can you imperatively create a simple Nginx Pod?",
+    "command": "kubectl run nginx --image=nginx",
+    "notes": "While kubectl run is quick for creating single Pods for testing, for production workloads you should always use declarative manifests and higher-level objects like Deployments."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command would you use to find out which nodes are ready?",
+    "command": "kubectl get nodes",
+    "notes": "The STATUS column will show Ready for healthy nodes. You can use kubectl describe node  to get more details about a node's condition."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How can you list all resources in a specific namespace?",
+    "command": "kubectl get all -n",
+    "notes": "Note that kubectl get all does not actually get all resources. It gets a common set of resources like Pods, Services, Deployments, and ReplicaSets. It does not include things like ConfigMaps, Secrets, or Ingresses."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you apply a YAML file from a URL?",
+    "command": "kubectl apply -f https://",
+    "notes": "This is a common way to install applications or components directly from their source repositories."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you check the version of the Kubernetes API server?",
+    "command": "kubectl version",
+    "notes": "This command shows both the client (kubectl) version and the server version. It's important to keep these versions from skewing too far apart."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you get the IP address of a Pod?",
+    "command": "kubectl get pod -o wide or kubectl get pod -o jsonpath='{.status.podIP}'",
+    "notes": "The -o wide option provides more information, including the Pod's IP and the node it's running on."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you force delete a Pod that is stuck in the Terminating state?",
+    "command": "kubectl delete pod --grace-period=0 --force",
+    "notes": "This should be used as a last resort, as it can have side effects on the node and for stateful applications. The pod may be stuck terminating because the node it is on is down or the Kubelet is not responding."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you create a Deployment named 'webapp' with image 'nginx' and 3 replicas using an imperative command?",
+    "command": "kubectl create deploy webapp --image=nginx --replicas=3",
+    "notes": "This is the fastest way to generate a Deployment YAML or create it directly. Since imperative commands don't support every possible configuration option, a common exam strategy is to use this command with --dry-run=client -o yaml to generate a base template, then modify the YAML file to add advanced fields like livenessProbes or resources."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What kubectl command scales the deployment 'frontend' to 5 replicas?",
+    "command": "kubectl scale deploy frontend --replicas=5",
+    "notes": "The scale command imperatively updates the spec.replicas field in the Deployment. While this is quick, keep in mind that if you re-apply the original YAML file (which might say replicas: 1), it will revert your changes. In a real declarative workflow, you would edit the YAML file instead."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you update the image of container 'nginx' in deployment 'web' to 'nginx:1.19'?",
+    "command": "kubectl set image deploy/web nginx=nginx:1.19",
+    "notes": "This command updates the PodSpec template, which triggers the Deployment controller to create a new ReplicaSet. A RollingUpdate begins immediately. It is crucial to monitor the progress using kubectl rollout status to ensure the new image is successfully pulling and starting."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you create a ConfigMap named 'app-config' from a literal value 'color=blue'?",
+    "command": "kubectl create cm app-config --from-literal=color=blue",
+    "notes": "Imperative creation is faster than writing YAML for simple values. You can use the --from-literal flag multiple times in a single command to add multiple key-value pairs. Be careful with special characters in the value; they may need to be escaped or quoted in your shell."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to create a Secret named 'db-secret' with a password '123456'?",
+    "command": "kubectl create secret generic db-secret --from-literal=password=123456",
+    "notes": "\"Secrets created via CLI are automatically base64 encoded by Kubernetes. It is a common misconception that Secrets are encrypted by default; they are merely encoded. Anyone with API access to view Secrets can decode them (echo \"\"val\"\"\""
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command creates a HorizontalPodAutoscaler (HPA) for deployment 'api' (cpu 50%, min 2, max 10)?",
+    "command": "kubectl autoscale deploy api --cpu-percent=50 --min=2 --max=10",
+    "notes": "This command creates an HPA resource that automatically scales the number of replicas to maintain an average CPU utilization of 50% across all pods. For this to work, the Deployment MUST have CPU requests defined in its spec, or the HPA cannot calculate the percentage."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to mark 'node-1' as unschedulable (maintenance mode)?",
+    "command": "kubectl cordon node-1",
+    "notes": "Cordoning a node adds a SchedulingDisabled taint/status. It prevents new pods from landing there, but existing pods are untouched. This is often the first step in maintenance, followed by draining."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you force delete a Pod named 'bad-pod' immediately?",
+    "command": "kubectl delete pod bad-pod --force --grace-period=0",
+    "notes": "\"This sends a SIGKILL immediately, bypassing the default 30-second grace period. This is useful for stuck \"\"Terminating\"\" pods, but dangerous for stateful applications as it creates a risk of data corruption since the app has no time to shut down cleanly.\""
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you output the YAML of a running pod 'web' without the cluster-specific status fields?",
+    "command": "kubectl get pod web -o yaml",
+    "notes": "kubectl neat"
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to expose a deployment named 'nginx' as a Service on port 80?",
+    "command": "kubectl expose deploy nginx --port=80 --name=nginx-service",
+    "notes": "This creates a ClusterIP service by default. The --port flag specifies the port the Service exposes, while --target-port (optional, defaults to same as port) is the port on the container. Using expose is faster than writing YAML during the exam.  Specify target port if different from container port: kubectl expose deployment nginx --port=80 --target-port=8080  Specify service type (e.g., NodePort): kubectl expose deployment nginx --port=80 --type=NodePort"
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you verify if the CoreDNS pods are running correctly?",
+    "command": "kubectl get pods -n kube-system -l k8s-app=kube-dns",
+    "notes": "CoreDNS runs as a Deployment in the kube-system namespace. If DNS fails, check these pods logs (kubectl logs -n kube-system -l k8s-app=kube-dns) or check if the Service kube-dns exists.   kubectl get deployment coredns -n kube-systemkubectl logs -n kube-system -l k8s-app=kube-dnskubectl get svc kube-dns -n kube-systemkubectl run dns-test-128 --image=busybox:1.28 --rm -it --restart=Never -- nslookup kubernetes.default"
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command allows you to view the IP addresses of all pods in the cluster?",
+    "command": "kubectl get pods -o wide --all-namespaces",
+    "notes": "The -o wide flag reveals the node assignment and the Pod IP. This is useful for verifying that pods are receiving IPs from the expected CIDR range configured in the CNI."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the first command to check why a Pod is in 'Pending' state?",
+    "command": "kubectl describe pod",
+    "notes": "\"Look at the Events section at the bottom. It usually reveals scheduling issues like \"\"Insufficient cpu/memory,\"\" \"\"Taint/Toleration mismatch,\"\" or \"\"Unbound PersistentVolumeClaim\"\".\""
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you check for available resources on a node to debug scheduling failures?",
+    "command": "kubectl describe node",
+    "notes": "\"Look at the \"\"Allocatable\"\" vs \"\"Capacity\"\" sections. It shows how much CPU/Memory is actually available for new Pods after reserving resources for system daemons.\""
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you verify if the Control Plane components (apiserver, scheduler, etc.) are healthy?",
+    "command": "kubectl get pods -n kube-system",
+    "notes": "Most control plane components run as Static Pods in the kube-system namespace. If they are missing or crashing, check their manifest files in /etc/kubernetes/manifests/."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "If CoreDNS pods are crashing (CrashLoopBackOff), how do you debug them?",
+    "command": "kubectl logs -n kube-system -l k8s-app=kube-dns",
+    "notes": "Common causes include a loop in the Corefile (forwarding to itself) or network plugin (CNI) failures preventing the pod from getting an IP."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command allows you to inspect the file system of a crashing container that won't stay running?",
+    "command": "kubectl debug -it --copy-to=debug-pod --container=debug --image=busybox",
+    "notes": "This creates a copy of the pod with a new sidecar container/shell, allowing you to mount and inspect the volume/files of the crashing container without it exiting immediately.  --target: Adds an ephemeral container to an existing Pod to debug it live.  --copy-to: Creates a new Pod copied from the original for offline debugging.  Feature--target--copy-toDebug typeEphemeral containerNew PodOriginal PodSame PodCopied PodLive state\u2705\u274cCan change config\u274c\u2705Needs ephemeral support\u2705\u274cBest forCrashing containerDeep config debugging"
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view the events for a specific namespace 'dev' sorted by timestamp?",
+    "command": "kubectl get events -n dev --sort-by='.lastTimestamp'",
+    "notes": "This is useful to see a chronological history of failures (e.g., Scheduling failures -> ImagePullBackOff -> CrashLoopBackOff) in a noisy namespace."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "If a Pod is stuck in 'Terminating' state, how can you force delete it?",
+    "command": "kubectl delete pod --force --grace-period=0",
+    "notes": "This bypasses the graceful shutdown. Use this only if the node is down or the Pod is unresponsive; otherwise, it may leave orphaned resources/locks."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you check the status of the container runtime (containerd/docker) on a node?",
+    "command": "systemctl status containerd (or docker/crio)",
+    "notes": "If the runtime is down, Kubelet cannot start any containers. crictl ps is also useful to list containers at the runtime level, bypassing Kubernetes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you generate a Deployment YAML without creating it?",
+    "command": "kubectl create deploy <name> --image=<image> --replicas=3 --dry-run=client -o yaml",
+    "notes": "The fastest way to get a manifest template related to deployments. '--dry-run=client' validates the command locally without sending it to the server. '-o yaml' outputs the resource definition to stdout, which you can redirect to a file."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view the Taints applied to a node?",
+    "command": "kubectl describe node <node-name>",
+    "notes": "grep Taint"
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view the labels attached to all nodes?",
+    "command": "kubectl get nodes --show-labels",
+    "notes": "Useful for verifying nodeSelector or affinity matching. The '--show-labels' flag adds an extra column to the output displaying all labels. This is faster than describing each node individually when checking cluster topology."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you force a rollout restart of a deployment?",
+    "command": "kubectl rollout restart deployment <name>",
+    "notes": "Useful to reload configmaps or secrets without changing the pod spec directly. It triggers a new rollout by updating the pod template's metadata/annotations. This ensures that pods pick up changes in referenced external resources."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view the history of a rollout?",
+    "command": "kubectl rollout history deployment <deployment-name>",
+    "notes": "Shows revisions. Specific revisions can be seen with --revision=N. It lists the revision number and the CHANGE-CAUSE (if recorded). Essential for identifying which revision to rollback to in case of failure."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view the Endpoints of a Service?",
+    "command": "kubectl describe service <service-name>",
+    "notes": "Check the Endpoints row. If <none>, the service selector doesn't match any pods. Endpoints are the IPs of the backing Pods that the Service routes traffic to. This is the first place to check if a Service is not reaching its targets."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you verify the DNS configuration (Corefile)?",
+    "command": "kubectl get cm coredns -n kube-system -o yaml",
+    "notes": "CoreDNS config is stored in a ConfigMap. Look for forward plugin for upstream resolution. The 'Corefile' key inside the ConfigMap contains the server configuration. Modifying this allows you to add custom stub domains or change upstream DNS servers."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you check which pods are using a specific PersistentVolumeClaim?",
+    "command": "kubectl get pods --all-namespaces -o=custom-columns=NAME:.metadata.name,PVC:.spec.volumes[].persistentVolumeClaim.claimName",
+    "notes": "Advanced filtering to see PVC usage or just describe pod if you know the pod. This custom-column command iterates through all pods and extracts the claimName. Useful for identifying which pods are binding specific storage volumes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you check the status of CSRs (CertificateSigningRequests)?",
+    "command": "kubectl get csr",
+    "notes": "Check for Pending, Approved, or Denied. CSRs are used for bootstrapping node certificates or user authentication. A 'Pending' state means the request is waiting for manual approval or an auto-approver."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you approve a CSR?",
+    "command": "kubectl certificate approve <csr-name>",
+    "notes": "Required when adding new nodes or users with certificates. This command signs the request using the cluster's CA. Once approved, the certificate is issued and available in the CSR status."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you bind a Role to a User?",
+    "command": "kubectl create rolebinding dev-binding --role=dev-role --user=daily-user -n <namespace>",
+    "notes": "Links permissions (Role) to identity (User/SA). A RoleBinding applies the permissions defined in 'dev-role' to the user 'daily-user'. This binding is specific to the namespace defined by '-n'."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you view the cluster info and master endpoint?",
+    "command": "kubectl cluster-info",
+    "notes": "Quick check for API server connectivity and core component URLs. Displays the control plane URL and CoreDNS service address. Useful to verify that your kubeconfig is pointing to the correct cluster."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you run a temporary busybox pod for network debugging?",
+    "command": "kubectl run tmp-shell --rm -it --image=busybox -- sh",
+    "notes": "--rm deletes it on exit. Useful for nslookup or wget. '-it' gives you an interactive terminal inside the container. Using 'sh' overrides the default entrypoint to give you a shell immediately."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you list all resources in a namespace?",
+    "command": "kubectl get all -n <namespace>",
+    "notes": "Lists pods, deployments, services, replicasets, etc. Note: It does not list absolutely everything (e.g., ConfigMaps, Secrets are excluded). It gives a high-level overview of the workloads in the namespace."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you sort pods by restart count?",
+    "command": "kubectl get pods --sort-by='.status.containerStatuses[0].restartCount'",
+    "notes": "Helpful to quickly identify unstable pods. Uses JSONPath to access the restartCount field inside containerStatuses. Pods with high restarts will appear at the bottom of the list."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you get the PodCIDR of a specific node?",
+    "command": "kubectl get node <node> -o jsonpath='{.spec.podCIDR}'",
+    "notes": "Critical for troubleshooting CNI or networking issues. Extracts the IP range assigned to the node for allocating Pod IPs. If this is missing, the CNI plugin may fail to schedule pods on this node."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you force delete a Pod named 'error-pod' immediately?",
+    "command": "kubectl delete pod error-pod --force --grace-period=0",
+    "notes": "Useful for stuck Terminating pods. Bypasses the graceful termination period (SIGTERM) and sends SIGKILL. Removes the API object immediately; useful when nodes are down."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command lists all resources in the cluster that are NOT namespaced?",
+    "command": "kubectl api-resources --namespaced=false",
+    "notes": "Useful to discover cluster-wide resources like Nodes, PVs, ClusterRoles, and StorageClasses. Helps identify which resources do not belong to any specific namespace. Great for exam questions asking about cluster-scoped objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command changes the current kubeconfig context to 'research'?",
+    "command": "kubectl config use-context research",
+    "notes": "Essential for switching between clusters or user contexts during the exam. Modifies the 'current-context' in your local .kube/config file. Ensures subsequent commands run against the correct cluster/user pair."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you list all events in the 'default' namespace sorted by timestamp?",
+    "command": "kubectl get events --sort-by='.lastTimestamp'",
+    "notes": "Extremely useful for troubleshooting to see the order of errors. Events are namespaced objects that log state changes and errors. Sorting helps visualize the sequence of failures (e.g., Pulling -> Failed)."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you create a generic Secret named 'db-secret' with a password literal?",
+    "command": "kubectl create secret generic db-secret --from-literal=password=s3cr3t",
+    "notes": "Faster than creating a file and using --from-file. Encodes the literal string into base64 automatically. The secret can then be mounted as an EnvVar or Volume in a Pod."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you Create a ConfigMap 'nginx-config' from a file?",
+    "command": "kubectl create configmap nginx-config --from-file=/opt/nginx.conf",
+    "notes": "The filename becomes the key, and the file content becomes the value. Useful for importing entire configuration files into Kubernetes. This ConfigMap can be mounted as a file inside a container."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What command lists all DaemonSets in all namespaces?",
+    "command": "kubectl get daemonsets -A",
+    "notes": "DaemonSets ensure one pod per node. Commonly used for system components like kube-proxy, CNI plugins, and log collectors. Checking this verifies that system agents are running on all nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you get the documentation for the 'spec.containers.livenessProbe' field?",
+    "command": "kubectl explain pod.spec.containers.livenessProbe",
+    "notes": "Essential for finding correct YAML syntax and field names during the exam. Provides the description, type, and required fields for the resource. Reduces the need to browse external documentation."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "How do you output just the names of all pods in the default namespace?",
+    "command": "kubectl get pods -o name",
+    "notes": "Returns output like pod/nginx, pod/redis. Simplifies scripting and automation. Example: 'kubectl delete $(kubectl get pods -o name)' deletes all pods."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config set-context <co...?",
+    "command": "kubectl config set-context <context-of-question> --namespace=<namespace-of-question>",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config use-context <co...?",
+    "command": "kubectl config use-context <context-of-question>",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config view...?",
+    "command": "kubectl config view",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config view --minify -...?",
+    "command": "kubectl config view --minify -o jsonpath='{.clusters.cluster.server}'",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config current-context...?",
+    "command": "kubectl config current-context",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config set-credentials...?",
+    "command": "kubectl config set-credentials myuser --client-key=myuser.key --client-certificate=myuser.crt --embed-certs=true",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl api-resources...?",
+    "command": "kubectl api-resources",
+    "notes": "Executes: kubectl api-resources.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl run frontend --image=n...?",
+    "command": "kubectl run frontend --image=nginx:1.24.0 --port=80",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl run nginx --image=ngin...?",
+    "command": "kubectl run nginx --image=nginx:1.27.4-alpine",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete pod?",
+    "command": "kubectl delete pod frontend",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete pod?",
+    "command": "kubectl delete pod nginx --now",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete deployment?",
+    "command": "kubectl delete deployment myapp",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to manage rollout of history?",
+    "command": "kubectl rollout history deployment nginx",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to edit pod?",
+    "command": "kubectl edit pod frontend",
+    "notes": "Executes: kubectl edit pod frontend.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to patch pod?",
+    "command": "kubectl patch pod frontend -p '...'",
+    "notes": "Executes: kubectl patch pod frontend -p '...'.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to annotate deployment?",
+    "command": "kubectl annotate deployment nginx kubernetes.io/change-cause=\"Pick up patch version\"",
+    "notes": "Executes: kubectl annotate deployment nginx kubernetes.io/change-cause=\"Pick up patch version\".\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl port-forward service/p...?",
+    "command": "kubectl port-forward service/prometheus-operated 8080:9090",
+    "notes": "Executes: kubectl port-forward service/prometheus-operated 8080:9090.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl exec -it nginx --names...?",
+    "command": "kubectl exec -it nginx --namespace=j43 -- /bin/sh",
+    "notes": "Executes a command inside a running container.\nCommonly used with '-it -- /bin/sh' for interactive shell.\nAllows direct file inspection and network testing."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of pods?",
+    "command": "kubectl get pods -n kube-flannel",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of pod?",
+    "command": "kubectl get pod web-app -o yaml",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of all?",
+    "command": "kubectl get all",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of deployments?",
+    "command": "kubectl get deployments",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of replicasets?",
+    "command": "kubectl get replicasets",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of service?",
+    "command": "kubectl get service prometheus-operated",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of serviceaccounts?",
+    "command": "kubectl get serviceaccounts",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of hpa?",
+    "command": "kubectl get hpa nginx-hpa",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of pod?",
+    "command": "kubectl describe pod etcd-kube-control-plane -n kube-system",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of application?",
+    "command": "kubectl describe application nginx",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to apply configuration for -f?",
+    "command": "kubectl apply -f nginx-deployment.yaml",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to apply configuration for -f?",
+    "command": "kubectl apply -f app-stack/",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to apply configuration for -f?",
+    "command": "kubectl apply -f web-app/ -R",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to apply configuration for -f?",
+    "command": "kubectl apply -f https://raw.githubusercontent.com/...",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create -f?",
+    "command": "kubectl create -f https://operatorhub.io/install/argocd-operator.yaml",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete -f?",
+    "command": "kubectl delete -f nginx-deployment.yaml",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of roles?",
+    "command": "kubectl get roles",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of role?",
+    "command": "kubectl describe role read-only",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create rolebinding?",
+    "command": "kubectl create rolebinding read-only-binding --role=read-only --user=bmuschko",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of rolebindings?",
+    "command": "kubectl get rolebindings",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of rolebinding?",
+    "command": "kubectl describe rolebinding read-only-binding",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create clusterrolebinding?",
+    "command": "kubectl create clusterrolebinding api-clusterrolebinding --serviceaccount=apps:api-access --clusterrole=api-clusterrole",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of clusterroles?",
+    "command": "kubectl describe clusterroles pods-services-aggregation-rules -n rbac-example",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of secret?",
+    "command": "kubectl get secret db-credentials -o yaml",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create configmap?",
+    "command": "kubectl create configmap app-config --from-file=application.yaml",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of configmap?",
+    "command": "kubectl get configmap app-config -o yaml",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create secret?",
+    "command": "kubectl create secret generic db-credentials --from-literal=db-password=passwd",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create ns?",
+    "command": "kubectl create ns kube-flannel",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to label --overwrite?",
+    "command": "kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged",
+    "notes": "Updates labels on a resource.\nLabels are used for selectors by Services and Deployments.\nUse '--overwrite' to change an existing label."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete namespace?",
+    "command": "kubectl delete namespace j43",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of csv?",
+    "command": "kubectl get csv -n operators",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of crds?",
+    "command": "kubectl get crds",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of crd?",
+    "command": "kubectl describe crd applications.argoproj.io",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of crd?",
+    "command": "kubectl get crd backups.example.com",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of backups?",
+    "command": "kubectl get backups",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of backup?",
+    "command": "kubectl describe backup nginx-backup",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: alias k=kubectl...?",
+    "command": "alias k=kubectl",
+    "notes": "Executes: alias k=kubectl.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config set-context <co...?",
+    "command": "kubectl config set-context <context> --namespace=<namespace>",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config use-context <co...?",
+    "command": "kubectl config use-context <context>",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl config set-credentials...?",
+    "command": "kubectl config set-credentials ...",
+    "notes": "Manages kubeconfig files (clusters, users, contexts).\nUse 'use-context' to switch environments.\nCrucial for multi-cluster management."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl run <name> --image=<im...?",
+    "command": "kubectl run <name> --image=<image> --port=<port>",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl run <name> ... --dry-r...?",
+    "command": "kubectl run <name> ... --dry-run=client -o yaml > pod.yaml",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl run <name> ... --label...?",
+    "command": "kubectl run <name> ... --labels=<key>=<value>",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl run <name> ... --env=\"...?",
+    "command": "kubectl run <name> ... --env=\"<key>=<value>\"",
+    "notes": "Imperatively creates a Pod.\nFastest way to spin up a single instance (vs Deployment).\nUse '--dry-run=client -o yaml' to generate manifests quickly."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete pod?",
+    "command": "kubectl delete pod <name> --now",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to manage rollout of status?",
+    "command": "kubectl rollout status deployment <name>",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to manage rollout of history?",
+    "command": "kubectl rollout history deployment <name>",
+    "notes": "Manages Deployment rollouts.\nCheck status, history, or undo a failed update.\nEssential for zero-downtime application updates."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to autoscale deployment?",
+    "command": "kubectl autoscale deployment <name> --cpu-percent=<n> --min=<n> --max=<n>",
+    "notes": "Executes: kubectl autoscale deployment <name> --cpu-percent=<n> --min=<n> --max=<n>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create service?",
+    "command": "kubectl create service clusterip <name> --tcp=<port>:<targetPort>",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create service?",
+    "command": "kubectl create service nodeport <name> --tcp=<port>:<targetPort>",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create service?",
+    "command": "kubectl create service loadbalancer <name> --tcp=<port>:<targetPort>",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create ingress?",
+    "command": "kubectl create ingress <name> --rule=\"<host>/<path>=<service>:<port>\"",
+    "notes": "Exposes an application to the network.\nClusterIP is internal, NodePort is external access.\nEnsures stable networking for dynamic pods."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create job?",
+    "command": "kubectl create job <name> --image=<image> -- <command>",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create cronjob?",
+    "command": "kubectl create cronjob <name> --schedule=\"<cron>\" --image=<image> ...",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create configmap?",
+    "command": "kubectl create configmap <name> --from-literal=<key>=<value>",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create configmap?",
+    "command": "kubectl create configmap <name> --from-file=<file>",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create secret?",
+    "command": "kubectl create secret generic <name> --from-literal=<key>=<value>",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create secret?",
+    "command": "kubectl create secret generic <name> --from-file=<file> --type=kubernetes.io/ssh-auth",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to create rolebinding?",
+    "command": "kubectl create rolebinding <name> --role=<role> --user=<user>",
+    "notes": "Creates a resource from the command line.\nUseful for RBAC roles, Secrets, and ConfigMaps.\nFaster than writing YAML from scratch for simple objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to apply configuration for -f?",
+    "command": "kubectl apply -f <filename/directory/url>",
+    "notes": "Declaratively manages resources from a file.\nUpdates existing live resources with local file changes.\nThe standard method for GitOps workflows."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to delete -f?",
+    "command": "kubectl delete -f <filename>",
+    "notes": "Deletes resources from the cluster.\nUse '--force --grace-period=0' for immediate removal (careful!).\nCan delete by file (-f) or name."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to replace -f?",
+    "command": "kubectl replace -f <filename>",
+    "notes": "Executes: kubectl replace -f <filename>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to edit <resource>?",
+    "command": "kubectl edit <resource> <name>",
+    "notes": "Executes: kubectl edit <resource> <name>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to patch <resource>?",
+    "command": "kubectl patch <resource> <name> -p <json>",
+    "notes": "Executes: kubectl patch <resource> <name> -p <json>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to label pod?",
+    "command": "kubectl label pod <name> <key>=<value>",
+    "notes": "Updates labels on a resource.\nLabels are used for selectors by Services and Deployments.\nUse '--overwrite' to change an existing label."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to annotate pod?",
+    "command": "kubectl annotate pod <name> <key>=<value>",
+    "notes": "Executes: kubectl annotate pod <name> <key>=<value>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of pods?",
+    "command": "kubectl get pods -o wide",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of pods?",
+    "command": "kubectl get pods --show-labels",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of pods?",
+    "command": "kubectl get pods -l <selector>",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of endpoints?",
+    "command": "kubectl get endpoints <service>",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of networkpolicy?",
+    "command": "kubectl get networkpolicy",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of pv?",
+    "command": "kubectl get pv",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to list or get details of events?",
+    "command": "kubectl get events",
+    "notes": "Lists resources in the current context/namespace.\nUse '-o wide' for more stats or '-o yaml' to export.\nEssential for verifying the state of objects."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of pod?",
+    "command": "kubectl describe pod <name>",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of deployment?",
+    "command": "kubectl describe deployment <name>",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of service?",
+    "command": "kubectl describe service <name>",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Command to show details of ingress?",
+    "command": "kubectl describe ingress <name>",
+    "notes": "Shows detailed status and events for a resource.\nUse this to debug issues like Pending pods or Crashing containers.\nLook at the 'Events' section at the bottom."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl logs <name>...?",
+    "command": "kubectl logs <name>",
+    "notes": "Fetches logs from a container in a Pod.\nUse '-p' for previous instance logs or '-f' to follow.\nVital for application debugging."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl logs <name> -f...?",
+    "command": "kubectl logs <name> -f",
+    "notes": "Fetches logs from a container in a Pod.\nUse '-p' for previous instance logs or '-f' to follow.\nVital for application debugging."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl exec -it <name> -- /bi...?",
+    "command": "kubectl exec -it <name> -- /bin/sh",
+    "notes": "Executes a command inside a running container.\nCommonly used with '-it -- /bin/sh' for interactive shell.\nAllows direct file inspection and network testing."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl exec <name> -- <comman...?",
+    "command": "kubectl exec <name> -- <command>",
+    "notes": "Executes a command inside a running container.\nCommonly used with '-it -- /bin/sh' for interactive shell.\nAllows direct file inspection and network testing."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl port-forward <name> <l...?",
+    "command": "kubectl port-forward <name> <local>:<remote>",
+    "notes": "Executes: kubectl port-forward <name> <local>:<remote>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl alpha debug -it <name>...?",
+    "command": "kubectl alpha debug -it <name> --image=<image>",
+    "notes": "Executes: kubectl alpha debug -it <name> --image=<image>.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: kubectl api-versions...?",
+    "command": "kubectl api-versions",
+    "notes": "Executes: kubectl api-versions.\nCheck official docs for flags and options.\nEnsure logical context (namespace/cluster) is correct."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to build?",
+    "command": "docker build -t <tag> .",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "What is the command to run: docker images...?",
+    "command": "docker images",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to run?",
+    "command": "docker run -d -p <host>:<container> <image>",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to container?",
+    "command": "docker container ls",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to logs?",
+    "command": "docker logs <id>",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to exec?",
+    "command": "docker exec -it <id> bash",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to tag?",
+    "command": "docker tag <source> <target>",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to push?",
+    "command": "docker push <image>",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to save?",
+    "command": "docker save -o <file> <image>",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  },
+  {
+    "section": "Miscellaneous",
+    "question": "Docker command to load?",
+    "command": "docker load --input <file>",
+    "notes": "Container runtime command.\nUsed to build, push, or inspect images manually.\nNote: Kubernetes may use containerd, so crictl is often preferred on nodes."
+  }
+]
