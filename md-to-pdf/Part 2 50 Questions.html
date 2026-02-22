@@ -1,0 +1,2672 @@
+
+    <html>
+    <head>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #eaecef;
+            padding-bottom: 10px;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        h2 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 5px;
+            font-weight: 600;
+        }
+        h3 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f8f9fa;
+            font-family: "Courier New", Courier, monospace;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            border: 1px solid #e9ecef;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        blockquote {
+            border-left: 4px solid #ccc;
+            margin: 0 0 15px 0;
+            padding-left: 15px;
+            color: #666;
+            font-style: italic;
+        }
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 30px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        /* Print Styles */
+        @media print {
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            @page {
+                margin: 1in;
+            }
+        }
+    </style>
+    </head>
+    <body>
+    <h1>CKA Exam Domains</h1>
+<ul>
+<li><a href="#domain-i-troubleshooting-30---the-high-stakes-domain">Domain I: Troubleshooting (30%) - The High-Stakes Domain</a></li>
+<li><a href="#domain-ii-cluster-architecture-installation--configuration-25---the-modern-tooling-domain">Domain II: Cluster Architecture, Installation &amp; Configuration (25%) - The Modern Tooling Domain</a></li>
+<li><a href="#domain-iii-services--networking-20---the-connectivity-domain">Domain III: Services &amp; Networking (20%) - The Connectivity Domain</a></li>
+<li><a href="#domain-iv-workloads--scheduling-15---the-resource-management-domain">Domain IV: Workloads &amp; Scheduling (15%) - The Resource Management Domain</a></li>
+<li><a href="#domain-v-storage-10---the-persistence-domain">Domain V: Storage (10%) - The Persistence Domain</a></li>
+</ul>
+<h1>Domain I: Troubleshooting (30%) - The High-Stakes Domain</h1>
+<p>As the most heavily weighted domain, Troubleshooting presents the most complex and challenging scenarios. Success in this area is paramount to passing the exam.</p>
+<p><strong>Core Task 1:</strong> Control Plane Failure Diagnosis. A recurring, high-difficulty scenario involves diagnosing and repairing a non-functional control plane. The typical setup presents a cluster where key components like kube-apiserver and kube-scheduler are failing, while etcd and the kubelet remain operational. The task requires a systematic approach to debugging. Candidates must inspect the static pod manifests located in /etc/kubernetes/manifests, validate the YAML configuration files for errors, and examine component logs. Since these components run as static pods, standard kubectl logs commands will not work; proficiency with node-level tools like journalctl or container-runtime-specific commands (e.g., crictl logs) is essential.</p>
+<p><strong>Core Task 2:</strong> Worker Node &amp; CNI Misconfiguration. This pattern tests the candidate's understanding of the networking stack at the node level. A common task involves installing a Container Network Interface (CNI) plugin, such as Calico or Flannel, from a provided manifest file. After installation, pods remain in a Pending or ContainerCreating state. The root cause is often a mismatch between the Pod CIDR range configured for the cluster via kubeadm and the network range defined in the CNI's configuration, which is typically stored in a ConfigMap or a Custom Resource. The candidate must identify this discrepancy and patch the CNI's configuration to align with the cluster's Pod CIDR, thereby restoring pod-to-pod connectivity. This directly assesses the "Troubleshoot clusters and nodes" competency outlined in the official curriculum.</p>
+<p><strong>Core Task 3:</strong> Application &amp; Networking Debugging. These tasks present a functioning cluster but a failing application, often due to connectivity issues. Scenarios may involve debugging why a service is unreachable, which requires checking that the service's label selector correctly matches the pods' labels, verifying that the Endpoints object has been populated with pod IPs, and ensuring that no Network Policies are inadvertently blocking traffic. Another common variant involves troubleshooting DNS resolution failures, which points towards investigating the health and configuration of CoreDNS in the kube-system namespace.</p>
+<h1>Domain II: Cluster Architecture, Installation &amp; Configuration (25%) - The Modern Tooling Domain</h1>
+<p>This domain has been significantly updated to include modern application management and cluster extension tools.</p>
+<p><strong>Core Task 1:</strong> Helm Operations. Proficiency with the Helm CLI is now mandatory. A representative task involves installing a software package (e.g., ArgoCD) using a Helm chart from a public repository. A frequent and subtle variation of this task requires installing a chart while preventing the installation of its associated CRDs, under the premise that the CRDs already exist in the cluster from a previous installation. This requires knowledge of specific Helm flags like --skip-crds or chart-specific values passed via --set crds.install=false. Another reported task involves using helm template to render a chart's manifests into a local file for inspection or modification before applying them to the cluster with kubectl apply -f.</p>
+<p><strong>Core Task 2:</strong> CRD Management. This tests the ability to interact with and understand cluster API extensions. A typical two-part task involves first listing all CRDs in the cluster that match a certain keyword (e.g., cert-manager) and redirecting the output to a file. The second part requires the candidate to use the kubectl explain command to introspect the schema of one of these CRDs. For example, the task might be to find and document the purpose of a specific field, such as spec.secretName, within a Certificate CRD. This is a direct, practical test of the "Understand CRDs" competency.</p>
+<p><strong>Core Task 3:</strong> RBAC Configuration. A classic CKA task, Role-Based Access Control configuration remains a core competency. Exam questions typically present a scenario requiring the creation of a Role (for namespace-scoped permissions) or a ClusterRole (for cluster-wide permissions). The candidate must then create a RoleBinding or ClusterRoleBinding to grant a specific user or ServiceAccount the defined permissions. The permissions are usually very specific, such as granting the ability to only get, list, and watch pods within the frontend namespace.</p>
+<h1>Domain III: Services &amp; Networking (20%) - The Connectivity Domain</h1>
+<p>Networking questions on the CKA exam are known for their complexity and nuance, requiring careful reading and precise execution.</p>
+<p><strong>Core Task 1:</strong> Ingress to Gateway API Migration. This is a flagship task of the 2025 curriculum, reflecting the industry's shift towards the more expressive and role-oriented Gateway API. A common scenario involves an existing application that is exposed to external traffic via a traditional Ingress resource. The candidate's task is to create a new Gateway resource and an HTTPRoute resource to replicate the exact functionality of the old Ingress, including host-based routing and TLS termination using an existing secret. After verifying the new configuration works, the final step is to delete the legacy Ingress resource. This task directly assesses the "Use the Gateway API to manage Ingress traffic" competency.</p>
+<p><strong>Core Task 2:</strong> Advanced Network Policy Implementation. Network Policy questions have evolved beyond simple ingress denial. A frequent format presents a complex traffic flow requirement and provides several pre-written YAML manifests for different Network Policies. The candidate must analyze the requirement (e.g., "Allow ingress traffic to pods with label app=backend only from pods in the frontend namespace on TCP port 8080") and select and apply the one manifest that correctly implements this rule. Success requires a deep understanding of how podSelector, namespaceSelector, and ipBlock work together in both ingress and egress rules.</p>
+<p><strong>Core Task 3:</strong> Service Exposure. While fundamental, this task appears frequently and tests for precision under pressure. The objective is typically to expose an existing Deployment using a NodePort service. The question will specify the exact port on the node (nodePort), the port on the service, and the container's target port that traffic should be forwarded to.</p>
+<h1>Domain IV: Workloads &amp; Scheduling (15%) - The Resource Management Domain</h1>
+<p>This domain focuses on the lifecycle of applications running on the cluster and the mechanisms for controlling their placement and resource consumption.</p>
+<p><strong>Core Task 1:</strong> Node Resource Allocation. This is a highly practical task that simulates a real-world resource contention problem. The scenario involves a Deployment with multiple replicas where some pods are stuck in the Pending state due to insufficient CPU or memory on the worker nodes. The candidate must first use kubectl describe node <node-name> to inspect the node's Allocatable resources. Then, they must perform a calculation to determine how to distribute the available resources evenly among the required number of pods, ensuring to leave a small buffer for system daemons. Finally, they must edit the Deployment manifest to set appropriate CPU and memory requests and limits that allow all replicas to be scheduled successfully.</p>
+<p><strong>Core Task 2:</strong> Horizontal Pod Autoscaler (HPA) Configuration. This is a common task testing the "Configure workload autoscaling" competency. The candidate is asked to create a HorizontalPodAutoscaler for an existing Deployment. The requirements are specific: scale based on CPU utilization, with a defined minimum and maximum number of replicas (e.g., min 2, max 5), and a target average CPU utilization percentage across all pods (e.g., 70%).</p>
+<p><strong>Core Task 3:</strong> Default StorageClass Configuration. This is a subtle administrative task that can easily trip up candidates unfamiliar with annotations. The scenario presents a cluster with multiple StorageClass objects, none of which is designated as the default. The task is to make one of them the default for all future dynamic provisioning requests that do not specify a storageClassName. This cannot be achieved by simply editing the object's spec. The correct method is to use kubectl patch to set the annotation storageclass.kubernetes.io/is-default-class to "true" on the desired StorageClass. It is also best practice to ensure this annotation is set to "false" or is absent on all other StorageClasses.</p>
+<h1>Domain V: Storage (10%) - The Persistence Domain</h1>
+<p>While having the lowest weight, storage questions test specific and sometimes non-obvious administrative knowledge.</p>
+<p><strong>Core Task 1</strong>: Binding to an Existing Persistent Volume (PV). This task moves beyond simple dynamic provisioning and tests a deeper understanding of the PV/PVC binding lifecycle. The environment contains a pre-created PV with specific characteristics (e.g., a capacity of 1Gi, an access mode of ReadWriteOnce, and a particular storageClassName). The candidate must create a new PersistentVolumeClaim (PVC) whose specification (access mode, storage request, and storage class) precisely matches the existing PV, which will cause the control plane to bind them together. The final step is to create a pod that mounts this PVC.</p>
+<p><strong>Core Task 2</strong>: Default StorageClass Configuration. This is a subtle administrative task that can easily trip up candidates unfamiliar with annotations. The scenario presents a cluster with multiple StorageClass objects, none of which is designated as the default. The task is to make one of them the default for all future dynamic provisioning requests that do not specify a storageClassName. This cannot be achieved by simply editing the object's spec. The correct method is to use kubectl patch to set the annotation storageclass.kubernetes.io/is-default-class to "true" on the desired StorageClass. It is also best practice to ensure this annotation is set to "false" or is absent on all other StorageClasses.</p>
+<h1>The CKA 2025 Practice Question Bank.</h1>
+<p>This question bank is designed to reflect the "brownfield," scenario-based nature of the 2025 CKA exam. Each question requires analysis, modification, or troubleshooting of a pre-existing environment.</p>
+<h2>Domains with 10 questions each</h2>
+<ul>
+<li><a href="#domain-troubleshooting-10-questions">Domain: Troubleshooting (10 Questions)</a></li>
+<li><a href="#domain-cluster-architecture-installation--configuration-10-questions">Domain: Cluster Architecture, Installation &amp; Configuration (10 Questions)</a></li>
+<li><a href="#domain-services--networking-10-questions">Domain: Services &amp; Networking (10 Questions)</a></li>
+<li><a href="#domain-workloads--scheduling-10-questions">Domain: Workloads &amp; Scheduling (10 Questions)</a></li>
+<li><a href="#domain-storage-10-questions">Domain: Storage (10 Questions)</a></li>
+</ul>
+<h2>Domain: Troubleshooting (10 Questions)</h2>
+<h2>Question 1: Control Plane Component Failure</h2>
+<ul>
+<li><strong>Scenario:</strong> The cluster's API server is unresponsive. <code>kubectl</code> commands are failing with a connection refused error. The <code>etcd</code> and <code>kubelet</code> services on the control plane node <code>cp-node</code> are confirmed to be running.</li>
+<li><strong>Initial State:</strong> The static pod manifest for the kube-apiserver located at <code>/etc/kubernetes/manifests/kube-apiserver.yaml</code> on <code>cp-node</code> has been corrupted. A command argument is misspelled.</li>
+<li><strong>Task:</strong> SSH into <code>cp-node</code>. Investigate the kube-apiserver static pod manifest and correct the configuration error. Ensure the API server starts successfully and the cluster becomes responsive.</li>
+<li><strong>Validation:</strong> From the base node, run <code>kubectl get nodes</code>. The command should execute successfully and show the cluster nodes.</li>
+</ul>
+<h3>Solution</h3>
+<p>This scenario simulates a broken control plane where the <code>kube-apiserver</code> is down due to a syntax error in its static pod manifest. Since the API server is the entry point for all <code>kubectl</code> commands, standard CLI tools will not work. Accessing the node via SSH and fixing the manifest file directly is the required approach.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>SSH into the Control Plane Node:</strong>
+    Access the node where the API server is running (specified as <code>cp-node</code>).</p>
+<p><code>bash
+ssh cp-node</code></p>
+</li>
+<li>
+<p><strong>Verify the Component Status (Optional but Recommended):</strong>
+    Since <code>kubectl</code> is down, use <code>crictl</code> or check the kubelet logs to confirm the API server is failing.</p>
+<p>```bash</p>
+<h1>Check running containers (apiserver will likely be missing or exiting)</h1>
+<p>crictl ps | grep apiserver</p>
+<h1>Check kubelet logs for manifest errors</h1>
+<p>journalctl -u kubelet | tail -n 50
+```</p>
+</li>
+<li>
+<p><strong>Locate and Edit the Manifest:</strong>
+    The static pod manifests are managed by the kubelet and located in <code>/etc/kubernetes/manifests</code>.</p>
+<p>```bash
+cd /etc/kubernetes/manifests/
+ls</p>
+<h1>You should see kube-apiserver.yaml</h1>
+<p>```</p>
+</li>
+<li>
+<p><strong>Fix the Configuration Error:</strong>
+    Open the file and look for the misspelled argument.</p>
+<p><code>bash
+vi kube-apiserver.yaml</code></p>
+<p><em>Look for a line that looks like:</em>
+<code>- --commmand-argument</code> (e.g., misspelled) or an invalid flag.
+<em>Correct it to:</em>
+<code>- --command-argument</code> (correct spelling).</p>
+<p><em>Example:</em> finding a typo like <code>--etcd-servers</code> written as <code>--etcd-serveer</code>.</p>
+</li>
+<li>
+<p><strong>Save and Exit:</strong>
+    Save the file (<code>:wq</code> in vi). The kubelet automatically watches this directory and will detect the change. It will kill the old (failing) pod and start a new one with the corrected configuration.</p>
+</li>
+<li>
+<p><strong>Verify Recovery:</strong>
+    Wait a few moments for the API server to initialize.</p>
+<p>```bash</p>
+<h1>Check if the container is running now</h1>
+<p>crictl ps | grep apiserver
+```</p>
+</li>
+<li>
+<p><strong>Exit the Node:</strong></p>
+<p><code>bash
+exit</code></p>
+</li>
+</ol>
+<p><strong>Validation:</strong></p>
+<p>Back on the base node, try to interact with the cluster.</p>
+<pre><code class="language-bash">kubectl get nodes
+</code></pre>
+<p><em>Output should list the nodes with Status 'Ready'.</em></p>
+<hr />
+<h2>Question 2: CNI Pod CIDR Mismatch</h2>
+<ul>
+<li><strong>Scenario:</strong> A new worker node, <code>worker-3</code>, has been added to the cluster, but pods scheduled on it cannot communicate with pods on other nodes. Pods on <code>worker-3</code> are stuck in the <code>ContainerCreating</code> state.</li>
+<li><strong>Initial State:</strong> The cluster is using the Calico CNI. The main Calico configuration ConfigMap, named <code>calico-config</code> in the <code>kube-system</code> namespace, defines a Pod IP range that does not include the Pod CIDR assigned to <code>worker-3</code>.</li>
+<li><strong>Task:</strong> Identify the Pod CIDR assigned to <code>worker-3</code> by inspecting the node object. Edit the <code>calico-config</code> ConfigMap in the <code>kube-system</code> namespace to correctly include the Pod CIDR range of all nodes.</li>
+<li><strong>Validation:</strong> Create a test pod and ensure it gets scheduled on <code>worker-3</code> and enters the Running state. Exec into the pod and ping another pod on a different worker node.</li>
+</ul>
+<h3>Solution</h3>
+<p>This scenario tests your understanding of Kubernetes networking, specifically the relationship between the Node's <code>PodCIDR</code> (assigned by the Kubernetes Controller Manager) and the overlay network configuration managed by the CNI plugin (Calico). If the CNI is not aware of the CIDR range intended for a node, it cannot properly assign IPs or route traffic, leading to connectivity issues or pods stuck in <code>ContainerCreating</code>.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Identify the Node's Assigned Pod CIDR:</strong>
+    Check the <code>spec.podCIDR</code> field of the problematic node (<code>worker-3</code>).</p>
+<p>```bash
+kubectl get node worker-3 -o jsonpath='{.spec.podCIDR}'</p>
+<h1>Example Output checking: 192.168.3.0/24</h1>
+<p>```</p>
+</li>
+<li>
+<p><strong>Inspect the CNI Configuration:</strong>
+    Check the <code>calico-config</code> ConfigMap in the <code>kube-system</code> namespace to see the currently configured IP pool.</p>
+<p><code>bash
+kubectl get cm calico-config -n kube-system -o yaml</code></p>
+<p><em>Look for a field defining the network range, such a <code>typha_service_name</code> or a JSON blob in the <code>data</code> section describing the IP Pool (e.g., <code>cni_network_config</code>). Assume the configured range is too narrow (e.g., <code>192.168.0.0/23</code>) and misses the new node's CIDR.</em></p>
+</li>
+<li>
+<p><strong>Update the ConfigMap:</strong>
+    Edit the ConfigMap to expand the range to cover the new node's CIDR (e.g., change <code>192.168.0.0/23</code> to <code>192.168.0.0/16</code> or explicitly add the missing range).</p>
+<p><code>bash
+kubectl edit cm calico-config -n kube-system</code></p>
+<p><em>Locate the CIDR definition within the data section and update it.</em>
+<em>Save and exit (<code>:wq</code>).</em></p>
+</li>
+<li>
+<p><strong>Restart CNI Pods:</strong>
+    For the changes to take effect, restart the Calico node pods (DaemonSet).</p>
+<p><code>bash
+kubectl rollout restart daemonset calico-node -n kube-system</code></p>
+</li>
+</ol>
+<p><strong>Validation:</strong></p>
+<ol>
+<li>
+<p><strong>Create a Test Pod on the Node:</strong>
+    Use a <code>nodeSelector</code> or <code>nodeName</code> to force a pod onto <code>worker-3</code>.</p>
+<p><code>bash
+kubectl run test-pod --image=busybox --restart=Never --overrides='{"spec": {"nodeName": "worker-3"}}' -- sleep 3600</code></p>
+</li>
+<li>
+<p><strong>Verify Pod Running Status:</strong></p>
+<p>```bash
+kubectl get pod test-pod</p>
+<h1>Status should eventually change to Running</h1>
+<p>```</p>
+</li>
+<li>
+<p><strong>Test Connectivity:</strong>
+    Ping a pod on a different node.</p>
+<p>```bash</p>
+<h1>Get IP of a pod on another node (e.g., coredns)</h1>
+<p>kubectl get pods -n kube-system -o wide</p>
+<h1>Ping from test-pod</h1>
+<p>kubectl exec -it test-pod -- ping -c 2 <OTHER_POD_IP>
+```</p>
+</li>
+</ol>
+<hr />
+<h2>Question 3: CoreDNS Configuration Error</h2>
+<ul>
+<li><strong>Scenario:</strong> Pods across the cluster are unable to resolve external domain names (e.g., <code>google.com</code>), although internal service name resolution is working.</li>
+<li><strong>Initial State:</strong> The <code>coredns</code> ConfigMap in the <code>kube-system</code> namespace has been modified, and the <code>forward</code> plugin, which points to upstream DNS servers, has been accidentally removed.</li>
+<li><strong>Task:</strong> Edit the <code>coredns</code> ConfigMap. Re-add the <code>forward</code> plugin to the Corefile configuration, pointing to a public DNS server like <code>8.8.8.8</code>. After saving the changes, restart the CoreDNS pods to apply the new configuration.</li>
+<li><strong>Validation:</strong> Exec into a busybox pod and run <code>nslookup google.com</code>. The command should succeed.</li>
+</ul>
+<h3>Solution</h3>
+<p>This scenario simulates a common DNS issue where the cluster can resolve internal services (like <code>kubernetes.default</code>) but fails to resolve external domains (like <code>google.com</code>). This is controlled by the <code>forward</code> plugin in the CoreDNS configuration (Corefile). If this plugin is missing or misconfigured, CoreDNS doesn't know where to send queries for domains it doesn't authorize.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Verify the Problem (Optional):</strong>
+    Check the current CoreDNS configuration to confirm the missing <code>forward</code> plugin.</p>
+<p><code>bash
+kubectl get cm coredns -n kube-system -o yaml</code></p>
+<p><em>You should see the <code>Corefile</code> data block. Notice that the <code>forward . ...</code> line is missing.</em></p>
+</li>
+<li>
+<p><strong>Edit the ConfigMap:</strong>
+    You need to add the <code>forward</code> plugin back into the Corefile.</p>
+<p><code>bash
+kubectl edit cm coredns -n kube-system</code></p>
+<p><em>Locate the <code>Corefile</code> section. Add the <code>forward</code> line inside the main block (usually the one responsible for <code>.</code>). It should look something like this:</em></p>
+<p><code>text
+.:53 {
+    errors
+    health {
+       lameduck 5s
+    }
+    ready
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+       pods insecure
+       fallthrough in-addr.arpa ip6.arpa
+       ttl 30
+    }
+    # Add this line:
+    forward . 8.8.8.8
+    # OR use the node's resolver:
+    # forward . /etc/resolv.conf
+    cache 30
+    loop
+    reload
+    loadbalance
+}</code></p>
+<p><em>Save and exit (<code>:wq</code>).</em></p>
+</li>
+<li>
+<p><strong>Restart CoreDNS Pods:</strong>
+    ConfigMap changes are not picked up immediately by running pods (unless they have a reloader, but explicit restart is faster and safer for the exam).</p>
+<p><code>bash
+kubectl rollout restart deployment coredns -n kube-system</code></p>
+</li>
+</ol>
+<p><strong>Validation:</strong></p>
+<ol>
+<li>
+<p><strong>Run a Test Pod:</strong>
+    Launch a temporary pod with DNS tools (busybox or dnsutils).</p>
+<p><code>bash
+kubectl run test-dns --image=busybox:1.28 --restart=Never --rm -it -- nslookup google.com</code></p>
+<p><em>(Note: busybox 1.28 is often recommended because newer versions sometimes have issues with nslookup).</em></p>
+<p><em>Output should show the address of google.com.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 4: Ingress Controller Pods Not Ready</h2>
+<ul>
+<li><strong>Scenario:</strong> The NGINX Ingress Controller pods in the <code>ingress-nginx</code> namespace are in a <code>CrashLoopBackOff</code> state. Ingress resources are not functioning.</li>
+<li><strong>Initial State:</strong> The <code>ingress-nginx-controller</code> Deployment has a misconfigured liveness probe with an incorrect port, causing the kubelet to repeatedly kill and restart the pods.</li>
+<li><strong>Task:</strong> Inspect the <code>ingress-nginx-controller</code> Deployment in the <code>ingress-nginx</code> namespace. Identify the incorrect port in the liveness probe configuration and correct it to match the health check port exposed by the controller (port <code>10254</code>).</li>
+<li><strong>Validation:</strong> Run <code>kubectl get pods -n ingress-nginx</code>. The controller pods should enter the Running state and remain stable.</li>
+</ul>
+<h3>Solution</h3>
+<p>This scenario tests your ability to troubleshoot <code>CrashLoopBackOff</code> errors caused by misconfigured health checks. A <code>livenessProbe</code> determines if a container is running. If it fails, the kubelet kills the container and restarts it. If the probe is checking the wrong port, it will continually fail even if the application is healthy, creating a restart loop.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Identify the Problematic Pods:</strong>
+    Check the pods in the specified namespace.</p>
+<p><code>bash
+kubectl get pods -n ingress-nginx</code></p>
+<p><em>You should see pods with status <code>CrashLoopBackOff</code> or high restart counts.</em></p>
+</li>
+<li>
+<p><strong>Investigate the Cause:</strong>
+    Describe one of the failing pods to look at the Events section.</p>
+<p><code>bash
+kubectl describe pod &lt;pod-name&gt; -n ingress-nginx</code></p>
+<p><em>Look for "Liveness probe failed: Connection refused" or similar messages in the Events. Note the port being successfully or unsuccessfully accessed.</em></p>
+</li>
+<li>
+<p><strong>Edit the Deployment:</strong>
+    The pods are managed by a Deployment. You must edit the Deployment manifest.</p>
+<p><code>bash
+kubectl edit deployment ingress-nginx-controller -n ingress-nginx</code></p>
+</li>
+<li>
+<p><strong>Correct the Liveness Probe:</strong>
+    Scroll down to the <code>livenessProbe</code> section of the container spec.
+    <em>Change the port field from the incorrect value (e.g., <code>8080</code> or <code>80</code>) to the correct port <code>10254</code>.</em></p>
+<p><code>yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 10254 # &lt;-- Ensure this is 10254
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 10</code></p>
+<p><em>Save and exit (<code>:wq</code>).</em></p>
+</li>
+<li>
+<p><strong>Verify Verification:</strong>
+    The Deployment will rollout a new ReplicaSet with the fixed configuration.</p>
+<p><code>bash
+kubectl get pods -n ingress-nginx -w</code></p>
+<p><em>Watch as the old pods terminate and the new pods reach the <code>Running</code> state and stay there (Ready 1/1).</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 5: Node NotReady due to Kubelet Issue</h2>
+<ul>
+<li><strong>Scenario:</strong> A worker node named <code>node-fail</code> is reporting a <code>NotReady</code> status. Pods are being evicted from this node.</li>
+<li><strong>Initial State:</strong> The kubelet service on <code>node-fail</code> has stopped due to a configuration error in <code>/var/lib/kubelet/config.yaml</code> (e.g., an invalid <code>cgroupDriver</code> value).</li>
+<li><strong>Task:</strong> SSH into <code>node-fail</code>. Check the status of the kubelet service using <code>systemctl status kubelet</code>. Examine the service logs using <code>journalctl -u kubelet</code> to identify the configuration error. Correct the error in <code>/var/lib/kubelet/config.yaml</code> and restart the kubelet service.</li>
+<li><strong>Validation:</strong> From the control plane, run <code>kubectl get nodes</code>. The status of <code>node-fail</code> should return to <code>Ready</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>This question tests your ability to troubleshoot node-level components, specifically the <code>kubelet</code>, which is the primary node agent. The <code>kubelet</code> is a systemd service, so you must use standard Linux system administration tools (<code>systemctl</code>, <code>journalctl</code>, <code>vi</code>) rather than <code>kubectl</code>.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>SSH into the Failing Node:</strong>
+    Access the node experiencing issues (specified as <code>node-fail</code> or similar).</p>
+<p><code>bash
+ssh node-fail</code></p>
+</li>
+<li>
+<p><strong>Check Kubelet Status:</strong>
+    Verify if the service is running, failed, or stopped.</p>
+<p><code>bash
+systemctl status kubelet</code></p>
+<p><em>You will likely see <code>Active: activating (auto-restart)</code> or <code>Active: failed</code>. The exit code might be non-zero.</em></p>
+</li>
+<li>
+<p><strong>Inspect Logs for Errors:</strong>
+    Check the logs to find the <em>reason</em> it is failing.</p>
+<p><code>bash
+journalctl -u kubelet | tail -n 50</code></p>
+<p><em>Look for specific error messages. A common one in this scenario is related to the <strong>cgroup driver</strong>. For example: "failed to run Kubelet: misconfiguration: kubelet cgroup driver: "systemd" is different from docker cgroup driver: "cgroupfs"".</em></p>
+<p><em>Another possibility is a syntax error in the config file, which the logs will pinpoint.</em></p>
+</li>
+<li>
+<p><strong>Edit the Configuration:</strong>
+    The logs likely pointed to <code>/var/lib/kubelet/config.yaml</code>. Open it.</p>
+<p><code>bash
+sudo vi /var/lib/kubelet/config.yaml</code></p>
+<p><em>Find the erroneous parameter. If the error was the cgroup driver mismatch, change <code>cgroupDriver: systemd</code> to <code>cgroupDriver: cgroupfs</code> (or vice versa, matching what the container runtime is using).</em></p>
+</li>
+<li>
+<p><strong>Restart the Kubelet:</strong>
+    After saving the configuration, you must restart the service for changes to take effect.</p>
+<p><code>bash
+sudo systemctl daemon-reload # Optional, but good practice if unit file changed
+sudo systemctl restart kubelet</code></p>
+</li>
+<li>
+<p><strong>Verify Node Recovery (On Node):</strong></p>
+<p><code>bash
+systemctl status kubelet</code></p>
+<p><em>Ensure it says <code>Active: active (running)</code>.</em></p>
+<p><em>Exit the node:</em></p>
+<p><code>bash
+exit</code></p>
+</li>
+<li>
+<p><strong>Verify Node Recovery (From Control Plane):</strong>
+    Back on the main terminal:
+    <code>bash
+    kubectl get nodes</code>
+    <em>The node status should change from <code>NotReady</code> to <code>Ready</code>. (It may take up to a minute).</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 6: Service Endpoint Failure</h2>
+<ul>
+<li><strong>Scenario:</strong> A service named <code>frontend-svc</code> in the <code>default</code> namespace exists, but it has no endpoints, even though there are running pods that should be part of the service.</li>
+<li><strong>Initial State:</strong> The <code>frontend-svc</code> Service has a selector <code>app=frontend-app</code>, but the corresponding Deployment's pods have the label <code>app=frontend-web</code>.</li>
+<li><strong>Task:</strong> Modify the selector of the <code>frontend-svc</code> Service to match the labels of the existing pods (<code>app=frontend-web</code>).</li>
+<li><strong>Validation:</strong> Run <code>kubectl describe service frontend-svc</code>. The Endpoints field should now be populated with the IP addresses of the running pods.</li>
+</ul>
+<h3>Solution</h3>
+<p>Services find the pods they route traffic to using <strong>Label Selectors</strong>. If the Service's <code>spec.selector</code> does not exactly match the key-value pairs in the Pod's <code>metadata.labels</code>, the <code>Endpoints</code> list will be empty, and no traffic will reach the application.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Verify the Issue:</strong>
+    Check the service and note the empty Endpoints.</p>
+<p><code>bash
+kubectl describe service frontend-svc</code></p>
+<p><em>Look for the <code>Endpoints:</code> row. It will likely say <code>&lt;none&gt;</code>.</em>
+<em>Also note the <code>Selector:</code> value (e.g., <code>app=frontend-app</code>).</em></p>
+</li>
+<li>
+<p><strong>Check Pod Labels:</strong>
+    Find the actual labels on the application pods.</p>
+<p><code>bash
+kubectl get pods --show-labels</code></p>
+<p><em>Locate the frontend pods and see their labels (e.g., <code>app=frontend-web</code>).</em></p>
+</li>
+<li>
+<p><strong>Edit the Service:</strong>
+    Update the service to match the pods.</p>
+<p><code>bash
+kubectl edit service frontend-svc</code></p>
+</li>
+<li>
+<p><strong>Update the Selector:</strong>
+    Find the <code>selector</code> section and change the value.
+    Change <code>app: frontend-app</code> to <code>app: frontend-web</code>.</p>
+<p><code>yaml
+spec:
+  selector:
+    app: frontend-web # Updated to match pods
+  ports:
+  ...</code></p>
+<p><em>Save and exit (<code>:wq</code>).</em></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check the endpoints again.
+    <code>bash
+    kubectl describe service frontend-svc</code>
+    <em>The <code>Endpoints</code> field should now show IP addresses (e.g., <code>10.244.1.5:80</code>).</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 7: Persistent Volume Claim Stuck in Pending</h2>
+<ul>
+<li><strong>Scenario:</strong> A developer has created a PersistentVolumeClaim named <code>db-pvc</code> that is stuck in the <code>Pending</code> state and will not bind.</li>
+<li><strong>Initial State:</strong> The <code>db-pvc</code> requests 5Gi of storage with the <code>standard</code> StorageClass. However, the <code>standard</code> StorageClass provisions volumes that use the <code>ReadWriteMany</code> access mode, while the PVC is requesting <code>ReadWriteOnce</code>.</li>
+<li><strong>Task:</strong> There are no PVs that can satisfy the claim. Edit the <code>db-pvc</code> PersistentVolumeClaim and change its requested <code>accessModes</code> from <code>ReadWriteOnce</code> to <code>ReadWriteMany</code> to match what the StorageClass provides.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get pvc db-pvc</code>. The status should change from <code>Pending</code> to <code>Bound</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>For a PersistentVolumeClaim (PVC) to bind to a PersistentVolume (PV), the request must be satisfied by the volume's capabilities. This includes capacity, storage class, and <strong>Access Modes</strong>. If a PVC requests <code>ReadWriteOnce</code> but the available PVs (or the dynamic provisioner) only support <code>ReadWriteMany</code>, binding will fail.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Investigate the PVC:</strong>
+    Check why the PVC is pending.</p>
+<p><code>bash
+kubectl describe pvc db-pvc</code></p>
+<p><em>Check the Events section. You might see messages like "waiting for a volume to be created, either by external provisioner..." or "no persistent volumes available for this claim and no storage class is set".</em></p>
+</li>
+<li>
+<p><strong>Edit the PVC:</strong>
+    You need to change the <code>accessModes</code>.
+    <strong>Important:</strong> You typically cannot update <code>accessModes</code> of an existing PVC if it has already been bound or if the field is immutable (depending on the K8s version and state). However, for a <em>Pending</em> PVC that hasn't found a match, you often can, or you may need to delete and recreate it. The instructions say "Edit", so we try that first.</p>
+<p><code>bash
+kubectl edit pvc db-pvc</code></p>
+</li>
+<li>
+<p><strong>Modify Access Mode:</strong>
+    Change:</p>
+<p><code>yaml
+spec:
+  accessModes:
+    - ReadWriteOnce</code></p>
+<p>To:</p>
+<p><code>yaml
+spec:
+  accessModes:
+    - ReadWriteMany</code></p>
+<p><em>Save and exit (<code>:wq</code>).</em></p>
+<p><em>Note: If the API server rejects the update (saying the field is immutable), you must export the YAML, delete the PVC, and recreate it.</em></p>
+<p>```bash</p>
+<h1>If edit fails:</h1>
+<p>kubectl get pvc db-pvc -o yaml &gt; db-pvc.yaml
+vi db-pvc.yaml # fix the accessMode and remove status/metadata fields
+kubectl delete pvc db-pvc
+kubectl apply -f db-pvc.yaml
+```</p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check the status.
+    <code>bash
+    kubectl get pvc db-pvc</code>
+    <em>It should now show <code>Bound</code> (assuming the StorageClass can provision it).</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 8: Job Failing to Complete</h2>
+<ul>
+<li><strong>Scenario:</strong> A Job named <code>data-processor</code> continuously creates new pods that fail, and the Job never completes.</li>
+<li><strong>Initial State:</strong> The pod template within the <code>data-processor</code> Job specifies a container image <code>my-app:latest</code> that does not exist in the registry. The pods fail with an <code>ImagePullBackOff</code> error.</li>
+<li><strong>Task:</strong> Inspect the logs of one of the failed pods created by the Job to identify the image pull error. Edit the <code>data-processor</code> Job and correct the container image name to a valid one, such as <code>busybox</code>.</li>
+<li><strong>Validation:</strong> Delete the failed pods. The Job should create a new pod that runs to completion. Verify by running <code>kubectl get jobs data-processor</code> and checking that <code>COMPLETIONS</code> is <code>1/1</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>Kubernetes Jobs handle batch processes. If the pods created by a Job fail (e.g., due to configuration errors or application crashes), the Job controller will create new pods (up to <code>backoffLimit</code>) to try to complete the task. In this scenario, an invalid image causes an infinite failure loop until the backoff limit is reached.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Identify the Failed Pods:</strong>
+    List the pods to see the status.</p>
+<p><code>bash
+kubectl get pods</code></p>
+<p><em>You will see pods named <code>data-processor-xxxxx</code> with status <code>ImagePullBackOff</code> or <code>ErrImagePull</code>.</em></p>
+</li>
+<li>
+<p><strong>Investigate the Error:</strong>
+    Describe a pod to verify the cause.</p>
+<p><code>bash
+kubectl describe pod &lt;pod-name&gt;</code></p>
+<p><em>Check the Events section for "Failed to pull image".</em></p>
+</li>
+<li>
+<p><strong>Edit the Job:</strong>
+    You cannot change the <code>template</code> of an existing Job mostly. However, for the exam/practice, you might be able to edit it if the field is mutable, or more likely, you will need to replace it.
+    <em>Try editing first:</em></p>
+<p><code>bash
+kubectl edit job data-processor</code></p>
+<p><em>Change <code>image: my-app:latest</code> to <code>image: busybox</code>.</em>
+<em>If you receive an error stating the field is immutable, proceed to the next method.</em></p>
+<p><em>Method 2: Replace (safest)</em></p>
+<p>```bash
+kubectl get job data-processor -o yaml &gt; job.yaml
+vi job.yaml</p>
+<h1>Change image to 'busybox'</h1>
+<h1>Remove 'controller-uid' and 'resourceVersion' from metadata</h1>
+<h1>Remove 'status' section</h1>
+<p>kubectl replace --force -f job.yaml
+```</p>
+<p><em>(Note: <code>replace --force</code> deletes and recreates it).</em></p>
+</li>
+<li>
+<p><strong>Clean Up (If not using replace):</strong>
+    If you successfully edited the job or if previous failed pods are still there, you might want to delete the failed pods to force a new one immediately, though the Job controller handles this.</p>
+<p><code>bash
+kubectl delete pods -l job-name=data-processor</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Watch the job status.
+    <code>bash
+    kubectl get jobs data-processor -w</code>
+    <em>It should eventually show Completions <code>1/1</code>.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 9: Misconfigured Network Policy Blocking Traffic</h2>
+<ul>
+<li><strong>Scenario:</strong> A web application in the <code>web</code> namespace cannot connect to its database in the <code>db</code> namespace.</li>
+<li><strong>Initial State:</strong> A default-deny ingress Network Policy is applied to the <code>db</code> namespace. An additional Network Policy exists that is intended to allow traffic from the <code>web</code> namespace, but its <code>namespaceSelector</code> is misconfigured.</li>
+<li><strong>Task:</strong> Examine the Network Policies in the <code>db</code> namespace. Identify the policy intended to allow ingress from <code>web</code> and correct its <code>namespaceSelector</code> to properly match the labels of the <code>web</code> namespace.</li>
+<li><strong>Validation:</strong> Exec into a pod in the <code>web</code> namespace and successfully connect to the database service in the <code>db</code> namespace using a tool like <code>curl</code> or <code>netcat</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>Network Policies use labels to select pods and namespaces. A common mistake is using <code>matchLabels</code> on a <code>namespaceSelector</code> that doesn't match the actual labels on the namespace object itself (which are different from pod labels).</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Check Namespace Labels:</strong>
+    First, find out what labels the <code>web</code> namespace actually has.</p>
+<p><code>bash
+kubectl get namespace web --show-labels</code></p>
+<p><em>Note the labels, e.g., <code>name=web</code> or <code>project=web</code>.</em></p>
+</li>
+<li>
+<p><strong>Inspect Policies:</strong>
+    List the policies in the <code>db</code> namespace.</p>
+<p><code>bash
+kubectl get netpol -n db</code></p>
+<p><em>Identify the one that looks like it should allow access (e.g., <code>allow-web</code>).</em></p>
+</li>
+<li>
+<p><strong>Check Policy Configuration:</strong>
+    Describe the policy to see its selectors.</p>
+<p><code>bash
+kubectl describe netpol allow-web -n db</code></p>
+<p><em>Look at the <code>Ingress</code> rules. You might see <code>NamespaceSelector: project=web</code> but the namespace actually has <code>name=web</code>.</em></p>
+</li>
+<li>
+<p><strong>Edit the Policy:</strong>
+    Correct the selector.</p>
+<p><code>bash
+kubectl edit netpol allow-web -n db</code></p>
+<p><em>Change the <code>namespaceSelector</code> to match the actual label found in Step 1.</em></p>
+<p><code>yaml
+ingress:
+  - from:
+      - namespaceSelector:
+          matchLabels:
+            name: web # Ensure this matches the output from Step 1</code></p>
+<p><em>Save and exit (<code>:wq</code>).</em></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Test connectivity.
+    <code>bash
+    # Assuming there is a pod 'web-pod' in 'web' and a service 'db-svc' in 'db'
+    kubectl exec -n web web-pod -- curl -m 2 db-svc.db
+    # OR using nc
+    kubectl exec -n web web-pod -- nc -z -v -w 2 db-svc.db 5432</code>
+    <em>The command should succeed.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 10: Scheduler Failure</h2>
+<ul>
+<li><strong>Scenario:</strong> Newly created pods are remaining in the <code>Pending</code> state indefinitely. The cluster scheduler appears to be non-functional.</li>
+<li><strong>Initial State:</strong> The <code>kube-scheduler</code> static pod manifest at <code>/etc/kubernetes/manifests/kube-scheduler.yaml</code> on the control plane node references a non-existent configuration file via the <code>--config</code> flag.</li>
+<li><strong>Task:</strong> SSH to the control plane node. Inspect the <code>kube-scheduler</code> logs using <code>crictl logs</code> (or equivalent) to find the error about the missing config file. Edit the manifest at <code>/etc/kubernetes/manifests/kube-scheduler.yaml</code> and remove the invalid <code>--config</code> flag to allow the scheduler to start with its default configuration.</li>
+<li><strong>Validation:</strong> Create a new NGINX pod. It should be scheduled and transition to the Running state.</li>
+</ul>
+<h3>Solution</h3>
+<p>The kube-scheduler is responsible for assigning pods to nodes. If it fails, pods sit in the <code>Pending</code> state forever. In a kubeadm cluster, the scheduler runs as a static pod, meaning its definition lives in <code>/etc/kubernetes/manifests</code>. Debugging involves checking why the container keeps exiting.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Confirm Scheduler Issue:</strong>
+    Check the system components.</p>
+<p><code>bash
+kubectl get pods -n kube-system</code></p>
+<p><em>You will likely see <code>kube-scheduler-controlplane</code> in <code>CrashLoopBackOff</code> or seemingly missing if it's failing fast.</em></p>
+</li>
+<li>
+<p><strong>SSH to Control Plane:</strong>
+    Access the node.</p>
+<p><code>bash
+ssh control-plane</code></p>
+</li>
+<li>
+<p><strong>Inspect Logs:</strong>
+    Since the pod is crashing, <code>kubectl logs</code> might work, but <code>crictl</code> is more reliable on the node.</p>
+<p>```bash
+crictl ps -a | grep scheduler</p>
+<h1>Get the container ID from the output</h1>
+<p>crictl logs <container-id>
+```</p>
+<p><em>Look for errors like: <code>stat /etc/kubernetes/scheduler.conf: no such file or directory</code>.</em></p>
+</li>
+<li>
+<p><strong>Edit the Manifest:</strong>
+    Modify the static pod definition.</p>
+<p><code>bash
+cd /etc/kubernetes/manifests
+vi kube-scheduler.yaml</code></p>
+<p><em>Find the line containing the invalid flag, e.g., <code>--config=/etc/kubernetes/scheduler.conf</code>. Delete this line or correct the path if you knew the correct one. In this scenario, we remove it to revert to defaults.</em></p>
+</li>
+<li>
+<p><strong>Save and Exit:</strong>
+    Save the file (<code>:wq</code>). The Kubelet will automatically restart the static pod.</p>
+</li>
+<li>
+<p><strong>Verify Recovery:</strong>
+    Wait a few seconds.</p>
+<p>```bash
+crictl ps | grep scheduler</p>
+<h1>Should show Running</h1>
+<p>```</p>
+<p><em>Exit SSH.</em></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Create a test pod.
+    <code>bash
+    kubectl run test-schedule --image=nginx
+    kubectl get pod test-schedule -w</code>
+    <em>It should move from Pending to ContainerCreating to Running.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Domain: Cluster Architecture, Installation &amp; Configuration (10 Questions)</h2>
+<h2>Question 11: Install a Component with Helm</h2>
+<ul>
+<li><strong>Scenario:</strong> The monitoring team requires Prometheus to be installed in the cluster to collect metrics.</li>
+<li><strong>Initial State:</strong> A namespace <code>monitoring</code> exists. Helm is installed.</li>
+<li><strong>Task:</strong> Add the <code>prometheus-community</code> Helm repository. Install the Prometheus chart from this repository into the <code>monitoring</code> namespace, giving it the release name <code>prom-stack</code>.</li>
+<li><strong>Validation:</strong> Run <code>helm list -n monitoring</code>. It should show the <code>prom-stack</code> release in a deployed status.</li>
+</ul>
+<h3>Solution</h3>
+<p>Helm is the package manager for Kubernetes. It uses "Charts" (packages) stored in "Repositories". To install a chart, you first add the repository, update your local cache, and then run the install command.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Add the Repository:</strong>
+    Add the <code>prometheus-community</code> repo to your Helm configuration.</p>
+<p><code>bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts</code></p>
+</li>
+<li>
+<p><strong>Update Repo Cache:</strong>
+    Ensure you have the latest chart versions.</p>
+<p><code>bash
+helm repo update</code></p>
+</li>
+<li>
+<p><strong>Search for the Chart (Optional):</strong>
+    Verify the chart exists and find the correct name.</p>
+<p><code>bash
+helm search repo prometheus-community/prometheus</code></p>
+</li>
+<li>
+<p><strong>Install the Chart:</strong>
+    Install <code>prometheus</code> with the release name <code>prom-stack</code> into the <code>monitoring</code> namespace.</p>
+<p><code>bash
+helm install prom-stack prometheus-community/prometheus --namespace monitoring</code></p>
+<p><em>If the namespace does not exist (though the scenario says it does), you would add <code>--create-namespace</code>.</em></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check the installed release.</p>
+<p><code>bash
+helm list -n monitoring</code></p>
+<p><em>You should see <code>prom-stack</code> with status <code>deployed</code>.</em></p>
+</li>
+</ol>
+<p>To fix the permission error, we need to instruct the Prometheus server to run with permissions that allow it to write to the storage volume. Since you are running in Minikube, the most reliable fix is to run the container as the root user.</p>
+<pre><code class="language-bash">helm upgrade prom-stack prometheus-community/prometheus --namespace monitoring \
+  --set server.securityContext.runAsUser=0 \
+  --set server.securityContext.runAsNonRoot=false \
+  --set server.securityContext.runAsGroup=0 \
+  --set server.securityContext.fsGroup=0
+
+kubectl get pods -n monitoring -w
+</code></pre>
+<hr />
+<h2>Question 12: Helm Install with Custom Values</h2>
+<ul>
+<li><strong>Scenario:</strong> An existing Helm installation of cert-manager needs to be configured to not install its CRDs, as they will be managed manually.</li>
+<li><strong>Initial State:</strong> The <code>jetstack</code> Helm repository has been added.</li>
+<li><strong>Task:</strong> Install the <code>cert-manager</code> chart from the <code>jetstack</code> repository into the <code>cert-manager</code> namespace. During installation, use the <code>--set</code> flag to set the <code>installCRDs</code> value to <code>false</code>.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get crds | grep cert-manager</code>. No CRDs related to cert-manager should be present.</li>
+</ul>
+<h3>Solution</h3>
+<p>Helm charts allow configuration via values. <code>cert-manager</code> extensively uses Custom Resource Definitions (CRDs) to manage certificates. By default, the chart might try to install them, but in production environments, it is often recommended to manage CRDs separately (or they might already exist) to avoid accidental deletion during chart uninstallation.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Add/Update the Repository:</strong>
+    Ensure the <code>jetstack</code> repository is added and updated.</p>
+<p><code>bash
+helm repo add jetstack https://charts.jetstack.io
+helm repo update</code></p>
+</li>
+<li>
+<p><strong>Create Namespace:</strong>
+    Create the <code>cert-manager</code> namespace if it doesn't restrict.</p>
+<p><code>bash
+kubectl create namespace cert-manager --dry-run=client -o yaml | kubectl apply -f -</code></p>
+</li>
+</ol>
+<p><em>This command generates the namespace definition in YAML format without sending it to the API server (<code>--dry-run=client -o yaml</code>) and pipes it to <code>kubectl apply</code>. This provides an idempotent way to ensure the namespace exists without failing if it was already created.</em></p>
+<ol start="3">
+<li>
+<p><strong>Install with Custom Flag:</strong>
+    Install <code>cert-manager</code> setting <code>installCRDs</code> to <code>false</code>.</p>
+<p><code>bash
+helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --set installCRDs=false</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Verify that no CRDs were created by the helm chart.</p>
+<p><code>bash
+kubectl get crds | grep cert-manager</code></p>
+<p><em>This command should return no results.</em></p>
+<p><em>Check the release status:</em></p>
+<p><code>bash
+helm list -n cert-manager</code></p>
+</li>
+</ol>
+<hr />
+<h2>Question 13: List and Explain a CRD</h2>
+<ul>
+<li><strong>Scenario:</strong> An operator for Vault has been installed, and you need to document one of its custom resources.</li>
+<li><strong>Initial State:</strong> The cluster contains several CRDs, including <code>vaultsecrets.secrets.hashicorp.com</code>.</li>
+<li><strong>Task:</strong> List all CRDs in the cluster and save the list to a file named <code>/opt/crds.txt</code>. Then, use <code>kubectl explain</code> to find the documentation for the <code>spec.vault.address</code> field of the <code>VaultSecret</code> CRD and save this documentation to <code>/opt/crd_field.txt</code>.</li>
+<li><strong>Validation:</strong> Check the contents of the two files, <code>/opt/crds.txt</code> and <code>/opt/crd_field.txt</code>, to ensure they contain the correct information.</li>
+</ul>
+<h3>Solution</h3>
+<p>Custom Resource Definitions (CRDs) extend the Kubernetes API. Once installed, <code>kubectl</code> treats them like native resources. You can list them using <code>kubectl get crds</code> and explore their schema/documentation using <code>kubectl explain</code>, just like you would for a Pod or Service.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>List CRDs:</strong>
+    Get all custom resource definitions and save them to the specified file.</p>
+<p><code>bash
+kubectl get crds &gt; /opt/crds.txt</code></p>
+<p><em>You can verify the list contains the Vault CRD:</em></p>
+<p><code>bash
+grep vault /opt/crds.txt</code></p>
+</li>
+<li>
+<p><strong>Explain the Field:</strong>
+    Use <code>kubectl explain</code> to drill down into the schema of the <code>VaultSecret</code> resource. The question asks for <code>spec.vault.address</code>.</p>
+<p>```bash</p>
+<h1>Syntax: kubectl explain <resource>.<path></h1>
+<p>kubectl explain VaultSecret.spec.vault.address &gt; /opt/crd_field.txt
+```</p>
+<p><em>Note: If <code>VaultSecret</code> (Kind) doesn't work, try the plural name or full name if necessary, e.g., <code>vaultsecrets.spec.vault.address</code>.</em></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Verify the files were created and contain content.</p>
+<p><code>bash
+cat /opt/crds.txt
+cat /opt/crd_field.txt</code></p>
+</li>
+</ol>
+<hr />
+<h2>Question 14: Create a Specific RBAC Role</h2>
+<ul>
+<li><strong>Scenario:</strong> A new developer, <code>david</code>, needs read-only access to pods and services in the <code>dev</code> namespace.</li>
+<li><strong>Initial State:</strong> The <code>dev</code> namespace exists. A user <code>david</code> is present in the cluster's authentication system.</li>
+<li><strong>Task:</strong> Create a Role named <code>pod-service-reader</code> in the <code>dev</code> namespace that grants <code>get</code>, <code>list</code>, and <code>watch</code> permissions on pods and services. Then, create a RoleBinding named <code>david-reader-binding</code> to bind the <code>david</code> user to this new role.</li>
+<li><strong>Validation:</strong> Run <code>kubectl auth can-i get pods --as david -n dev</code>. The result should be <code>yes</code>. Run <code>kubectl auth can-i delete pods --as david -n dev</code>. The result should be <code>no</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>RBAC (Role-Based Access Control) in Kubernetes is used to regulate access to computer or network resources.</p>
+<ul>
+<li><strong>Role</strong>: Defines permissions (verbs like <code>get</code>, <code>list</code>) on resources (like <code>pods</code>) within a specific namespace.</li>
+<li><strong>RoleBinding</strong>: Grants the permissions defined in a Role to a User, Group, or ServiceAccount.</li>
+</ul>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Create the Role:</strong>
+    Use the imperative command to create the role <code>pod-service-reader</code> in namespace <code>dev</code> with the specified verbs and resources.</p>
+<p><code>bash
+kubectl create role pod-service-reader --verb=get,list,watch --resource=pods,services -n dev</code></p>
+<p><em>Alternatively, define it via YAML:</em></p>
+<p><code>yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: pod-service-reader
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["pods", "services"]
+    verbs: ["get", "list", "watch"]</code></p>
+</li>
+<li>
+<p><strong>Create the RoleBinding:</strong>
+    Bind the user <code>david</code> to the role <code>pod-service-reader</code>.</p>
+<p><code>bash
+kubectl create rolebinding david-reader-binding --role=pod-service-reader --user=david -n dev</code></p>
+<p><em>YAML Alternative:</em></p>
+<p><code>yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: david-reader-binding
+  namespace: dev
+subjects:
+  - kind: User
+    name: david # Name is case sensitive
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-service-reader
+  apiGroup: rbac.authorization.k8s.io</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Use the <code>auth can-i</code> command to verify permissions as the user <code>david</code>.</p>
+<p>```bash</p>
+<h1>Should return 'yes'</h1>
+<p>kubectl auth can-i get pods --as david -n dev</p>
+<h1>Should return 'no'</h1>
+<p>kubectl auth can-i delete pods --as david -n dev
+```</p>
+</li>
+</ol>
+<hr />
+<h2>Question 15: Create a Cluster-Wide RBAC Role</h2>
+<ul>
+<li><strong>Scenario:</strong> A cluster-wide auditing tool needs permission to view all nodes and persistent volumes in the cluster.</li>
+<li><strong>Initial State:</strong> A <code>ServiceAccount</code> named <code>auditor</code> exists in the <code>kube-system</code> namespace.</li>
+<li><strong>Task:</strong> Create a <code>ClusterRole</code> named <code>node-pv-viewer</code> that grants <code>get</code> and <code>list</code> permissions on nodes and persistent volumes. Create a <code>ClusterRoleBinding</code> named <code>auditor-global-binding</code> to grant the <code>auditor</code> ServiceAccount this ClusterRole.</li>
+<li><strong>Validation:</strong> Run <code>kubectl auth can-i list nodes --as=system:serviceaccount:kube-system:auditor</code>. The result should be <code>yes</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>While <code>Roles</code> and <code>RoleBindings</code> are namespaced, <code>ClusterRoles</code> and <code>ClusterRoleBindings</code> are cluster-wide. This is required for:</p>
+<ol>
+<li>Cluster-scoped resources (like Nodes, PersistentVolumes).</li>
+<li>Granting access multiple namespaces or the entire cluster.</li>
+</ol>
+<p><strong>0. Setup Initial State:</strong>
+Ensure the ServiceAccount exists as per the scenario.</p>
+<pre><code class="language-bash">kubectl create serviceaccount auditor -n kube-system
+</code></pre>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Create ClusterRole:</strong>
+    Define the permissions for cluster-scoped resources.</p>
+<p><code>bash
+kubectl create clusterrole node-pv-viewer --verb=get,list --resource=nodes,persistentvolumes</code></p>
+<p><em>Alternatively via YAML:</em></p>
+<p><code>yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: node-pv-viewer
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "persistentvolumes"]
+    verbs: ["get", "list"]</code></p>
+</li>
+<li>
+<p><strong>Create ClusterRoleBinding:</strong>
+    Bind the ServiceAccount to the ClusterRole. Note that for ServiceAccounts, you must specify the namespace they belong to.</p>
+<p><code>bash
+kubectl create clusterrolebinding auditor-global-binding \
+  --clusterrole=node-pv-viewer \
+  --serviceaccount=kube-system:auditor</code></p>
+<p><em>Alternatively via YAML:</em></p>
+<p><code>yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: auditor-global-binding
+subjects:
+  - kind: ServiceAccount
+    name: auditor
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: node-pv-viewer
+  apiGroup: rbac.authorization.k8s.io</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check permissions impersonating the ServiceAccount username. The username format for a ServiceAccount is <code>system:serviceaccount:&lt;namespace&gt;:&lt;name&gt;</code>.</p>
+<p>```bash
+kubectl auth can-i list nodes --as=system:serviceaccount:kube-system:auditor</p>
+<h1>Expected: yes</h1>
+<p>```</p>
+</li>
+</ol>
+<hr />
+<h2>Question 16: Upgrade a kubeadm Cluster</h2>
+<ul>
+<li><strong>Scenario:</strong> The cluster is running Kubernetes version <code>1.28.1</code> and needs to be upgraded to the latest patch release of <code>1.28</code>.</li>
+<li><strong>Initial State:</strong> A single-node kubeadm cluster is running version <code>1.28.1</code>.</li>
+<li><strong>Task:</strong> On the control plane node, update the package manager and install the target version of <code>kubeadm</code>. Run <code>kubeadm upgrade plan</code> to verify the upgrade path. Then, apply the upgrade using <code>kubeadm upgrade apply v1.28.x</code> (where <code>x</code> is the latest patch). After the control plane is upgraded, drain the node, upgrade <code>kubelet</code> and <code>kubectl</code>, and then uncordon the node.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get nodes</code>. The version column should reflect the new Kubernetes version.</li>
+</ul>
+<h3>Solution</h3>
+<p>Upgrading a Kubeadm cluster involves a specific order of operations:</p>
+<ol>
+<li><strong>Upgrade kubeadm</strong> on the node.</li>
+<li><strong>Drain</strong> the node (to prepare for downtime/restarts).</li>
+<li><strong>Upgrade the cluster</strong> using <code>kubeadm upgrade apply</code> (for control plane) or <code>node</code> (for workers).</li>
+<li><strong>Upgrade kubelet and kubectl</strong> on the node.</li>
+<li><strong>Restart kubelet</strong> and <strong>Uncordon</strong> the node.</li>
+</ol>
+<p><strong>Step-by-Step Solution:</strong></p>
+<p><em>Note: The commands below assume a Debian/Ubuntu-based system, which is standard for the CKA exam.</em></p>
+<ol>
+<li>
+<p><strong>Update Package Repository:</strong>
+    Update the <code>apt</code> cache to find new versions.</p>
+<p><code>bash
+apt-get update</code></p>
+</li>
+<li>
+<p><strong>Find Available Versions:</strong>
+    Check specifically for the 1.28 versions.</p>
+<p>```bash
+apt-cache madison kubeadm | grep 1.28</p>
+<h1>Example Output:</h1>
+<h1>kubeadm | 1.28.2-1.1 | https://pkgs.k8s.io/core:/stable:/v1.28/deb/ Packages</h1>
+<p>```</p>
+<p><em>Assume we identify <code>1.28.2-1.1</code> as the target.</em></p>
+</li>
+<li>
+<p><strong>Upgrade kubeadm:</strong>
+    Install/Upgrade the <code>kubeadm</code> binary first. To prevent it from being upgraded automatically in the future, we use <code>install</code> with specific version, and then <code>apt-mark hold</code> is a good practice (often already held).</p>
+<p><code>bash
+apt-mark unhold kubeadm
+apt-get install -y kubeadm=1.28.2-1.1
+apt-mark hold kubeadm</code></p>
+<p><em>Verify version:</em> <code>kubeadm version</code></p>
+</li>
+<li>
+<p><strong>Plan the Upgrade:</strong>
+    Verify the upgrade plan looks correct.</p>
+<p><code>bash
+kubeadm upgrade plan</code></p>
+<p><em>This checks pre-flight requirements and shows you the versions you can upgrade to.</em></p>
+</li>
+<li>
+<p><strong>Apply the Upgrade:</strong>
+    This upgrades the control plane components (etcd, API server, controller-manager, scheduler).</p>
+<p><code>bash
+sudo kubeadm upgrade apply v1.28.2</code></p>
+<p><em>Wait for the "SUCCESS" message.</em></p>
+</li>
+<li>
+<p><strong>Drain the Node:</strong>
+    Prepare the node for kubelet upgrade.</p>
+<p><code>bash
+kubectl drain &lt;node-name&gt; --ignore-daemonsets</code></p>
+<p><em>(If running on the same node, use <code>localhost</code> or the node name found in <code>kubectl get nodes</code>).</em></p>
+</li>
+<li>
+<p><strong>Upgrade kubelet and kubectl:</strong>
+    Upgrade the remaining binaries.</p>
+<p><code>bash
+apt-mark unhold kubelet kubectl
+apt-get install -y kubelet=1.28.2-1.1 kubectl=1.28.2-1.1
+apt-mark hold kubelet kubectl</code></p>
+</li>
+<li>
+<p><strong>Restart Kubelet:</strong>
+    Reload the configuration.</p>
+<p><code>bash
+systemctl daemon-reload
+systemctl restart kubelet</code></p>
+</li>
+<li>
+<p><strong>Uncordon the Node:</strong>
+    Bring the node back into scheduling.</p>
+<p><code>bash
+kubectl uncordon &lt;node-name&gt;</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check the node status and version.</p>
+<p><code>bash
+kubectl get nodes</code></p>
+<p><em>The <code>VERSION</code> column should now show <code>v1.28.2</code> and status <code>Ready</code>.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 17: Backup etcd</h2>
+<ul>
+<li><strong>Scenario:</strong> As part of a disaster recovery plan, you need to perform a manual backup of the etcd database.</li>
+<li><strong>Initial State:</strong> The cluster is running with an etcd instance managed by kubeadm as a static pod.</li>
+<li><strong>Task:</strong> Using the <code>etcdctl</code> binary, create a snapshot of the etcd database. You will need to provide the correct endpoint, CA certificate, client certificate, and key, which can be found by inspecting the etcd static pod manifest. Save the snapshot to <code>/opt/etcd-backup.db</code>.</li>
+<li><strong>Validation:</strong> Run <code>etcdctl snapshot status /opt/etcd-backup.db</code> to verify the integrity of the backup file.</li>
+</ul>
+<h3>Solution</h3>
+<p>All cluster data is stored in <strong>etcd</strong>. Backing it up is critical for restoring the cluster in case of a crash. Since etcd is secured with mutual TLS (mTLS), we must provide the certificates to the <code>etcdctl</code> tool to authorize the snapshot backup.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Retrieve Certificate Paths:</strong>
+    The etcd server configuration is defined in its static pod manifest. We need to find the paths for:</p>
+<ul>
+<li><code>--trusted-ca-file</code> (CACert)</li>
+<li><code>--cert-file</code> (Cert)</li>
+<li><code>--key-file</code> (Key)</li>
+<li><code>--listen-client-urls</code> (Endpoint)</li>
+</ul>
+<p>```bash</p>
+<h1>Inspect the manifest</h1>
+<p>cat /etc/kubernetes/manifests/etcd.yaml | grep file
+```</p>
+<p><em>Typical output locations (standard kubeadm):</em></p>
+<ul>
+<li>Point 1 (CACert): <code>/etc/kubernetes/pki/etcd/ca.crt</code></li>
+<li>Point 2 (Cert): <code>/etc/kubernetes/pki/etcd/server.crt</code></li>
+<li>Point 3 (Key): <code>/etc/kubernetes/pki/etcd/server.key</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Take the Snapshot:</strong>
+    Run the <code>etcdctl</code> command. Ensure <code>ETCDCTL_API=3</code> is set (it is the default in newer versions, but good practice to be explicit).</p>
+<p><code>bash
+ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot save /opt/etcd-backup.db</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Verify the snapshot file was created and is valid.</p>
+<p><code>bash
+ETCDCTL_API=3 etcdctl --write-out=table snapshot status /opt/etcd-backup.db</code></p>
+<p><em>This should display a table with Hash, Revision, and Total Key details.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 18: Add a New Worker Node</h2>
+<ul>
+<li><strong>Scenario:</strong> The cluster needs more capacity, and a new machine is ready to be joined as a worker node.</li>
+<li><strong>Initial State:</strong> A one-control-plane, one-worker cluster exists. A new machine <code>new-worker</code> is provisioned with a container runtime.</li>
+<li><strong>Task:</strong> On the control plane node, generate a new <code>kubeadm join</code> token. SSH to the <code>new-worker</code> machine and use the generated command (<code>kubeadm join ...</code>) to join the node to the cluster.</li>
+<li><strong>Validation:</strong> From the control plane, run <code>kubectl get nodes</code>. The <code>new-worker</code> node should appear in the list with a <code>Ready</code> status after a few moments.</li>
+</ul>
+<h3>Solution</h3>
+<p>Bootstrapping a new node into a Kubernetes cluster involves trust establishment. The <code>kubeadm join</code> command uses a token (shared secret) to authenticate with the control plane and a discovery token hash to validate the control plane's identity.</p>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Generate Join Command:</strong>
+    Run this on the <strong>control plane</strong> node. This command generates a valid token and prints the full <code>kubeadm join</code> command needed by the worker.</p>
+<p><code>bash
+kubeadm token create --print-join-command</code></p>
+<p><em>Output will look like:</em>
+<code>kubeadm join &lt;control-plane-ip&gt;:6443 --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;hash&gt;</code></p>
+</li>
+<li>
+<p><strong>Access the Worker Node:</strong>
+    SSH into the new machine.</p>
+<p><code>bash
+ssh new-worker</code></p>
+</li>
+<li>
+<p><strong>Run the Join Command:</strong>
+    Paste the command generated in Step 1. You needs <code>sudo</code> or root privileges.</p>
+<p><code>bash
+sudo kubeadm join &lt;control-plane-ip&gt;:6443 --token &lt;token&gt; --discovery-token-ca-cert-hash sha256:&lt;hash&gt;</code></p>
+<p><em>Wait for the "This node has joined the cluster" message.</em></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Go back to the control plane and check the node list.</p>
+<p><code>bash
+exit # Exit ssh session
+kubectl get nodes</code></p>
+<p><em>The new node should be in <code>Ready</code> state (or <code>NotReady</code> initially until the CNI plugin initializes pod networking on it).</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 19: Use Kustomize to Apply a Variant</h2>
+<ul>
+<li><strong>Scenario:</strong> An application has base configurations, but you need to deploy a staging variant with increased replica counts.</li>
+<li><strong>Initial State:</strong> A directory <code>/opt/app</code> contains a <code>kustomization.yaml</code> and a <code>deployment.yaml</code> (with 1 replica). A subdirectory <code>/opt/app/overlays/staging</code> contains another <code>kustomization.yaml</code>.</li>
+<li><strong>Task:</strong> Edit the Kustomization file in <code>/opt/app/overlays/staging</code> to use the base configuration but patch the Deployment to have 3 replicas. Then, apply the staging configuration to the cluster using <code>kubectl apply -k /opt/app/overlays/staging</code>.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get deployment</code> and verify that the application's deployment has 3 replicas running.</li>
+</ul>
+<h3>Solution</h3>
+<p>Kustomize is a configuration management tool built into <code>kubectl</code>. It allows you to define a "base" set of resources and then create "overlays" (variants) that patch the base for different environments (e.g., dev, staging, prod) without duplicating the entire YAML.</p>
+<ul>
+<li><strong>Base:</strong> The common configuration.</li>
+<li><strong>Overlay:</strong> Specific changes (like <code>replicas</code> or <code>resource</code> limits) applied on top of the base.</li>
+</ul>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Navigate to Overlay Directory:</strong>
+    Go to where the staging configuration is defined.</p>
+<p><code>bash
+cd /opt/app/overlays/staging</code></p>
+</li>
+<li>
+<p><strong>Edit Kustomization File:</strong>
+    You need to tell Kustomize to patch the <code>replicas</code> field. While you can use a separate patch file, Kustomize also supports inline patches or specific transformers like <code>replicas</code>.</p>
+<p><em>Method A: Using the <code>replicas</code> field (Simplest)</em>
+Open <code>kustomization.yaml</code>:</p>
+<p><code>bash
+vi kustomization.yaml</code></p>
+<p>Add/Modify:</p>
+<p>```yaml
+resources:
+  - ../../base # Points to the base directory</p>
+<p>replicas:
+  - name: my-app-deployment # Name of the deployment in the base
+    count: 3
+```</p>
+<p><em>Method B: Using an inline patch</em></p>
+<p>```yaml
+resources:
+  - ../../base</p>
+<p>patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: my-app-deployment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+```</p>
+<p><em>(Method A is preferred for simple replica changes).</em></p>
+</li>
+<li>
+<p><strong>Apply with Kustomize:</strong>
+    Use <code>kubectl apply -k &lt;directory&gt;</code>.</p>
+<p>```bash
+kubectl apply -k .</p>
+<h1>OR</h1>
+<p>kubectl apply -k /opt/app/overlays/staging
+```</p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check that the deployment was updated (or created) with 3 replicas.</p>
+<p><code>bash
+kubectl get deployment</code></p>
+<p><em>Ensure the <code>READY</code> column says <code>3/3</code>.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Question 20: Configure an External CRI</h2>
+<ul>
+<li><strong>Scenario:</strong> A node is configured to use dockerd, but policy requires it to use containerd.</li>
+<li><strong>Initial State:</strong> A worker node <code>worker-1</code> has both dockerd and containerd installed. The kubelet is configured to use the docker runtime socket.</li>
+<li><strong>Task:</strong> SSH to <code>worker-1</code>. Drain the node. Stop the kubelet. Edit the kubelet configuration (<code>/var/lib/kubelet/kubeadm-flags.env</code> or similar) to point to the containerd socket (<code>--container-runtime-endpoint=unix:///run/containerd/containerd.sock</code>). Restart the kubelet. Uncordon the node.</li>
+<li><strong>Validation:</strong> Run <code>kubectl describe node worker-1</code>. The Container Runtime Version should show <code>containerd://...</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>The Container Runtime Interface (CRI) allows Kubernetes to support various container runtimes. Changing the runtime involves ensuring the new runtime is installed/active and then reconfiguring the <code>kubelet</code> to point to the new runtime's socket.</p>
+<ul>
+<li><strong>Docker Shim (Legacy):</strong> <code>unix:///var/run/dockershim.sock</code> (Deprecated/Removed in 1.24+)</li>
+<li><strong>Containerd:</strong> <code>unix:///run/containerd/containerd.sock</code></li>
+</ul>
+<p><strong>Step-by-Step Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Drain the Node:</strong>
+    Schedule downtime for the node.</p>
+<p><code>bash
+kubectl drain worker-1 --ignore-daemonsets</code></p>
+</li>
+<li>
+<p><strong>SSH to the Node:</strong>
+    Access the worker node.</p>
+<p><code>bash
+ssh worker-1</code></p>
+</li>
+<li>
+<p><strong>Stop Kubelet:</strong>
+    Stop the service before making changes.</p>
+<p><code>bash
+systemctl stop kubelet</code></p>
+</li>
+<li>
+<p><strong>Edit Configuration:</strong>
+    Detailed configuration for kubeadm-managed nodes is often passed via environment variables in <code>/var/lib/kubelet/kubeadm-flags.env</code>. This file constructs the flags passed to the kubelet binary.</p>
+<p><code>bash
+vi /var/lib/kubelet/kubeadm-flags.env</code></p>
+<p><em>Find the <code>--container-runtime-endpoint</code> flag (or add it if missing) and set it to:</em>
+<code>--container-runtime-endpoint=unix:///run/containerd/containerd.sock</code></p>
+<p><em>Example line:</em>
+<code>KUBELET_KUBEADM_ARGS="--container-runtime-endpoint=unix:///run/containerd/containerd.sock --pod-infra-container-image=..."</code></p>
+</li>
+<li>
+<p><strong>Restart Kubelet:</strong>
+    Start the service.</p>
+<p><code>bash
+systemctl start kubelet</code></p>
+</li>
+<li>
+<p><strong>Uncordon Usage:</strong>
+    Return to the control plane (exit SSH) and enable the node.</p>
+<p><code>bash
+exit
+kubectl uncordon worker-1</code></p>
+</li>
+<li>
+<p><strong>Validation:</strong>
+    Check the CRI version.</p>
+<p><code>bash
+kubectl describe node worker-1 | grep "Container Runtime"</code></p>
+<p><em>It should show <code>containerd://&lt;version&gt;</code> instead of <code>docker://...</code>.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Domain: Services &amp; Networking (10 Questions)</h2>
+<h2>Question 21: Expose a Deployment with a NodePort Service</h2>
+<ul>
+<li><strong>Scenario:</strong> A deployment named <code>webapp</code> is running in the <code>app-space</code> namespace, and it needs to be accessible from outside the cluster for testing purposes.</li>
+<li><strong>Initial State:</strong> A Deployment <code>webapp</code> with 2 replicas is running in the <code>app-space</code> namespace. The pods expose port <code>8080</code>.</li>
+<li><strong>Task:</strong> Create a Service named <code>webapp-svc</code> of type <code>NodePort</code> in the <code>app-space</code> namespace. The service should expose port <code>80</code> on the service itself, target port <code>8080</code> on the pods, and expose node port <code>30080</code> on the cluster nodes.</li>
+<li><strong>Validation:</strong> Run <code>curl &lt;node-ip&gt;:30080</code> from the base node. It should return a response from the <code>webapp</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>To expose the application externally on a specific port on every node, we use a specific <code>nodePort</code> in the Service definition. The <code>kubectl expose</code> command is useful to generate the template with the correct selectors, but the <code>nodePort</code> field usually must be added manually in the YAML or by editing after generation.</p>
+<p><strong>Imperative Command to Generate YAML:</strong></p>
+<pre><code class="language-bash"># Generate the file with correct selectors automatically
+kubectl expose deployment webapp -n app-space --name=webapp-svc --type=NodePort --port=80 --target-port=8080 --dry-run=client -o yaml &gt; webapp-svc.yaml
+
+# Manually edit webapp-svc.yaml to include 'nodePort: 30080' in the ports section
+# Then apply
+kubectl apply -f webapp-svc.yaml
+</code></pre>
+<p><strong>YAML Manifest:</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-svc
+  namespace: app-space
+spec:
+  selector:
+    app: webapp # Note: Ensure this matches the Deployment's labels (check with: kubectl get deploy webapp -n app-space --show-labels)
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30080
+</code></pre>
+<hr />
+<h2>Question 22: Create an Ingress Resource</h2>
+<ul>
+<li><strong>Scenario:</strong> An application, served by <code>app-svc</code>, needs to be exposed externally via HTTP routing at the path <code>/app</code>.</li>
+<li><strong>Initial State:</strong> An Ingress controller is running. A service <code>app-svc</code> exists in the <code>default</code> namespace and exposes port <code>80</code>.</li>
+<li><strong>Task:</strong> Create an Ingress resource named <code>app-ingress</code>. It should route traffic for the path <code>/app</code> to the <code>app-svc</code> service on port <code>80</code>.</li>
+<li><strong>Validation:</strong> Find the external IP of the Ingress controller and run <code>curl http://&lt;ingress-ip&gt;/app</code>. It should connect to the <code>app-svc</code>.</li>
+</ul>
+<h3>Solution &amp; Minikube Practice Steps</h3>
+<p>To practice this in Minikube, you must first ensure the ingress controller is enabled.</p>
+<p><strong>1. Setup Environment:</strong></p>
+<pre><code class="language-bash"># Enable the NGINX Ingress controller
+minikube addons enable ingress
+
+# Create a sample application and service to act as the backend
+kubectl create deployment web --image=nginx
+kubectl expose deployment web --name=app-svc --port=80
+</code></pre>
+<p><strong>2. Create the Ingress (The Solution):</strong>
+You can create the ingress imperatively or using a YAML manifest.</p>
+<p><em>Imperative Command:</em></p>
+<pre><code class="language-bash">kubectl create ingress app-ingress --rule=&quot;/app=app-svc:80&quot; --class=nginx
+</code></pre>
+<p><em>Note: The <code>--class=nginx</code> flag is important in modern clusters.</em>/</p>
+<p><em>YAML Manifest:</em></p>
+<pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    # Optional: Necessary if the backend app expects root path '/' but receives '/app'
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /app
+            pathType: Prefix
+            backend:
+              service:
+                name: app-svc
+                port:
+                  number: 80
+</code></pre>
+<p><strong>3. Troubleshooting &amp; Validation:</strong></p>
+<p>If you receive a <strong>404 Not Found</strong> error when accessing <code>/app</code>, it is because the backend application (Nginx) expects requests at the root path <code>/</code> but is receiving <code>/app</code>. You need to add a rewrite annotation.</p>
+<p><strong>Fix 404 Error:</strong></p>
+<pre><code class="language-bash"># Add the rewrite annotation to existing ingress
+kubectl annotate ingress app-ingress nginx.ingress.kubernetes.io/rewrite-target=/
+</code></pre>
+<p><strong>Accessing via Localhost (Minikube Tunnel):</strong>
+If <code>minikube ip</code> is not accessible or you are on a driver that requires tunneling (like Docker on Mac):</p>
+<pre><code class="language-bash"># Open a tunnel in a separate terminal
+sudo minikube tunnel -p &lt;profile_name&gt; # e.g., minikube or cka-multinode
+
+# Test via localhost
+curl -L http://127.0.0.1/app
+</code></pre>
+<p><strong>Standard Validation:</strong></p>
+<pre><code class="language-bash"># Check the ingress status and IP
+kubectl get ingress app-ingress
+
+# Test the access
+curl http://$(minikube ip)/app
+</code></pre>
+<hr />
+<h2>Question 23: Ingress to Gateway API Migration</h2>
+<ul>
+<li><strong>Scenario:</strong> The organization is standardizing on the Gateway API. An existing application exposed via Ingress must be migrated.</li>
+<li><strong>Initial State:</strong> An Ingress resource <code>legacy-ingress</code> routes traffic for <code>app.example.com</code> to <code>app-svc</code>. A <code>GatewayClass</code> named <code>gw-class</code> exists. A TLS secret <code>app-tls</code> exists.</li>
+<li><strong>Task:</strong> Create a <code>Gateway</code> resource named <code>main-gateway</code> that uses the <code>gw-class</code> and listens on port <code>443</code> for HTTPS traffic from <code>app.example.com</code>, using the <code>app-tls</code> secret. Create an <code>HTTPRoute</code> named <code>app-route</code> that attaches to this gateway and routes requests for <code>app.example.com</code> to the <code>app-svc</code> service. After verifying the route works, delete the <code>legacy-ingress</code>.</li>
+<li><strong>Validation:</strong> Test connectivity to <code>https://app.example.com</code> (using <code>curl --resolve</code>). After confirming it works, verify that <code>kubectl get ingress legacy-ingress</code> returns “not found.”</li>
+</ul>
+<h3>Solution &amp; Concept Explanation</h3>
+<h4><strong>Concept: Why Gateway API?</strong></h4>
+<p>Gateway API is the successor to Ingress.</p>
+<ul>
+<li><strong>Role-Oriented:</strong> It splits responsibilities.</li>
+<li><strong>Infrastructure Provider</strong> manages <code>GatewayClass</code> (defines the controller, e.g., NGINX vs Istio).</li>
+<li><strong>Cluster Operator</strong> manages <code>Gateway</code> (defines entry points, ports, and TLS termination).</li>
+<li><strong>Developer</strong> manages <code>HTTPRoute</code> (defines URI routing to Services).</li>
+<li><strong>Expressiveness:</strong> Better support for header matching, traffic splitting (canary), and cross-namespace routing than standard Ingress.</li>
+<li><strong>Extensibility:</strong> Designed to support more than just HTTP (e.g., GRPC, TCP).</li>
+</ul>
+<h4><strong>Concept: TLS Secrets</strong></h4>
+<p>A Secret of type <code>kubernetes.io/tls</code> stores a certificate (<code>tls.crt</code>) and a private key (<code>tls.key</code>). In Gateway API, the <code>Gateway</code> resource references this Secret in its <code>listeners</code> section to terminate SSL/TLS traffic before forwarding it to the backend services.</p>
+<h4><strong>Minikube Lab Setup</strong></h4>
+<p>Gateway API is not installed by default. You must install the CRDs and a Controller (like NGINX Gateway Fabric).</p>
+<p><strong>1. Install Gateway API CRDs &amp; Controller (NGINX Gateway Fabric):</strong></p>
+<pre><code class="language-bash"># Install Standard Gateway API CRDs
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
+
+# Install NGINX Gateway Fabric CRDs
+kubectl apply -f https://raw.githubusercontent.com/nginx/nginx-gateway-fabric/v1.3.0/deploy/manifests/install.yaml
+# OR (if using newer version setup):
+# kubectl apply -k &quot;https://github.com/nginx/nginx-gateway-fabric/config/default?ref=v1.3.0&quot;
+</code></pre>
+<p><strong>2. Setup Initial State (Legacy Ingress):</strong></p>
+<pre><code class="language-bash"># Create Backend
+kubectl create deployment app-svc --image=nginx --port=80
+kubectl expose deployment app-svc --port=80
+
+# Create TLS Secret (Self-Signed)
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj &quot;/CN=app.example.com&quot;
+kubectl create secret tls app-tls --key tls.key --cert tls.crt
+
+# Create Legacy Ingress
+kubectl create ingress legacy-ingress --rule=&quot;app.example.com/=app-svc:80,tls=app-tls&quot; --class=nginx
+</code></pre>
+<p><strong>3. The Solution (Migration):</strong></p>
+<p><strong>Step A: Create GatewayClass (Already exists if using NGINX Fabric, named 'nginx')</strong></p>
+<p><strong>Step B: Create Gateway (Listening on 443 with TLS)</strong></p>
+<pre><code class="language-yaml">apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: main-gateway
+spec:
+  gatewayClassName: nginx
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: app.example.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: app-tls
+</code></pre>
+<p><strong>Step C: Create HTTPRoute (Routing Logic)</strong></p>
+<pre><code class="language-yaml">apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: app-route
+spec:
+  parentRefs:
+    - name: main-gateway
+  hostnames:
+    - &quot;app.example.com&quot;
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: app-svc
+          port: 80
+</code></pre>
+<p><strong>4. Validation:</strong></p>
+<pre><code class="language-bash"># Get IP of Gateway (via Tunnel if needed)
+kubectl get gateway main-gateway
+
+# Test connectivity
+curl -k --resolve app.example.com:443:127.0.0.1 https://app.example.com
+
+# Cleanup Legacy
+kubectl delete ingress legacy-ingress
+</code></pre>
+<hr />
+<h2>Question 24: Restrict Ingress Traffic with a Network Policy</h2>
+<ul>
+<li><strong>Scenario:</strong> A database in the <code>db</code> namespace should only accept connections from the application frontend in the <code>frontend</code> namespace.</li>
+<li><strong>Initial State:</strong> Pods in the <code>frontend</code> namespace (with label <code>app=frontend</code>) need to connect to pods in the <code>db</code> namespace (with label <code>app=db</code>) on port <code>5432</code>.</li>
+<li><strong>Task:</strong> Create a Network Policy named <code>db-allow-frontend</code> in the <code>db</code> namespace. This policy should apply to pods with the label <code>app=db</code>. It should define an ingress rule that allows traffic on TCP port <code>5432</code> only from pods in a namespace that has the label <code>name=frontend</code>.</li>
+<li><strong>Validation:</strong> Exec into a pod in the <code>frontend</code> namespace and confirm it can connect to the DB service. Exec into a pod in another namespace (e.g., <code>default</code>) and confirm the connection is blocked.</li>
+</ul>
+<h3>Full Solution &amp; Explanation</h3>
+<h4><strong>Concept: Cross-Namespace Access</strong></h4>
+<p>By default, standard <code>podSelector</code> rules only match pods <strong>within the same namespace</strong> as the NetworkPolicy.
+To allow traffic from a <em>different</em> namespace, you must use <code>namespaceSelector</code>.</p>
+<ul>
+<li><strong><code>namespaceSelector</code></strong>: Matches the <strong>labels of the Namespace object</strong> (not the pods inside it).</li>
+<li><strong><code>podSelector</code></strong>: Matches the <strong>labels of the Pods</strong> inside the selected namespace.</li>
+</ul>
+<h4><strong>Step 1: Environment Setup (Replicate the Scenario)</strong></h4>
+<p>First, we need to create the namespaces and pods to simulate the problem.</p>
+<pre><code class="language-bash"># 1. Create Namespaces
+kubectl create namespace db
+kubectl create namespace frontend
+
+# 2. LABEL THE FRONTEND NAMESPACE (Crucial Step!)
+# The NetworkPolicy will look for this label on the NAMESPACE itself.
+kubectl label namespace frontend name=frontend
+
+# 3. Create the Database Pod
+kubectl run db --image=redis --labels=&quot;app=db&quot; -n db
+
+# 4. Create the Frontend Pod
+kubectl run frontend --image=nginx --labels=&quot;app=frontend&quot; -n frontend
+</code></pre>
+<h4><strong>Step 2: The Solution (Network Policy)</strong></h4>
+<p>Create the policy in the <code>db</code> namespace to protect the <code>db</code> pod.</p>
+<pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-allow-frontend
+  namespace: db
+spec:
+  podSelector:
+    matchLabels:
+      app: db # Selects the DB pod in 'db' namespace
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: frontend # Matches the namespace label we added in Step 1
+          # Note: We do NOT add a podSelector here, so ANY pod in the 'frontend' namespace is allowed.
+      ports:
+        - protocol: TCP
+          port: 6379 # Redis port (or 5432 if using Postgres)
+</code></pre>
+<p><em>(Note: I used Redis (port 6379) for the example pod as it's lighter than Postgres, but the concept is identical for port 5432).</em></p>
+<h4><strong>Step 3: Validation</strong></h4>
+<pre><code class="language-bash"># 1. Test from frontend (Should Work)
+kubectl exec -it frontend -n frontend -- timeout 2 curl &lt;db-pod-ip&gt;:6379
+# (Or use nc/telnet if installed)
+
+# 2. Test from another namespace (Should Fail/Timeout)
+kubectl run hacker --image=nginx --restart=Never --rm -it -- timeout 2 curl &lt;db-pod-ip&gt;:6379
+</code></pre>
+<hr />
+<h2>Question 25: Allow Egress Traffic with a Network Policy</h2>
+<ul>
+<li><strong>Scenario:</strong> An application pod needs to make API calls to an external service at <code>192.0.2.10/32</code>, but all other outbound traffic should be blocked.</li>
+<li><strong>Initial State:</strong> A pod with label <code>app=api-client</code> in the <code>default</code> namespace. A default-deny egress policy is in effect for the namespace.</li>
+<li><strong>Task:</strong> Create a Network Policy named <code>allow-external-api</code> that applies to pods with <code>app=api-client</code>. The policy should define an egress rule that allows traffic to the IP block <code>192.0.2.10/32</code> on TCP port <code>443</code>.</li>
+<li><strong>Validation:</strong> Exec into the <code>api-client</code> pod. Confirm that <code>curl https://192.0.2.10</code> works, but <code>curl https://google.com</code> times out.</li>
+</ul>
+<h3>Solution</h3>
+<h4><strong>Concept: Egress Isolation</strong></h4>
+<p>Network Policies are additive (allow-lists). By default, all traffic is allowed.
+As soon as you apply a Network Policy that selects a pod and specifies "Egress" in <code>policyTypes</code>, <strong>ALL</strong> outbound traffic from that pod is blocked, <em>except</em> what is explicitly allowed by the rules.
+This is why we only need to define the rule for <code>192.0.2.10</code>. Everything else is automatically blocked because it's not on the list.</p>
+<h4><strong>YAML Manifest</strong></h4>
+<pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-api
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: api-client
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock: # Use ipBlock for external CIDR ranges
+            cidr: 192.0.2.10/32
+      ports:
+        - protocol: TCP
+          port: 443
+</code></pre>
+<p><em>Note: If you need DNS resolution (e.g., to resolve google.com even if you block access to it), you would also need to allow UDP port 53 to the cluster DNS.</em></p>
+<hr />
+<h2>Question 26: Create a Headless Service</h2>
+<ul>
+<li><strong>Scenario:</strong> A StatefulSet of database replicas requires a headless service for direct pod discovery.</li>
+<li><strong>Initial State:</strong> A StatefulSet named <code>db-statefulset</code> with 3 replicas exists. The pods have the label <code>app=db</code>.</li>
+<li><strong>Task:</strong> Create a headless Service named <code>db-svc-headless</code>. It should target pods with the label <code>app=db</code>. To make it headless, set the <code>clusterIP</code> field to <code>None</code>.</li>
+<li><strong>Validation:</strong> Run <code>nslookup db-svc-headless</code>. It should return the individual IP addresses of the three database pods.</li>
+</ul>
+<h3>Solution</h3>
+<p>A <strong>Headless Service</strong> allows you to communicate directly with Pods by returning their individual IP addresses via DNS, rather than a single ClusterIP. This is often used for stateful applications (like databases) where knowing the identity of each replica is important. You create one by setting <code>clusterIP: None</code> in the Service spec.</p>
+<p><strong>Imperative Command:</strong></p>
+<p>There isn't a direct flag to set <code>clusterIP: None</code> with <code>kubectl create service</code>. You usually generate a standard ClusterIP service content and modify it.</p>
+<pre><code class="language-bash">kubectl create service clusterip db-svc-headless --tcp=80:80 --dry-run=client -o yaml &gt; headless.yaml
+</code></pre>
+<p><strong>YAML Manifest:</strong></p>
+<p>Edit the file to add <code>clusterIP: None</code> and ensure the selector is correct.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: db-svc-headless
+spec:
+  clusterIP: None # Key field for Headless Service
+  selector:
+    app: db # Must match the Pod labels
+  ports:
+    - port: 80 # Service port
+      targetPort: 80 # Pod port
+</code></pre>
+<p><strong>Apply:</strong></p>
+<pre><code class="language-bash">kubectl apply -f headless.yaml
+</code></pre>
+<p><strong>Validation:</strong></p>
+<pre><code class="language-bash"># Verify the service has no ClusterIP
+kubectl get svc db-svc-headless
+
+# DNS Lookup (should return multiple IPs)
+kubectl run tmp-shell --rm -it --image=busybox:1.28 -- nslookup db-svc-headless
+</code></pre>
+<hr />
+<h2>Question 27: Select the Correct Network Policy Manifest</h2>
+<ul>
+<li><strong>Scenario:</strong> You are given three manifest files: <code>/opt/np-1.yaml</code>, <code>/opt/np-2.yaml</code>, and <code>/opt/np-3.yaml</code>. You must apply the one that implements a specific security rule.</li>
+<li><strong>Initial State:</strong> Three YAML files containing Network Policy definitions.</li>
+<li><strong>Task:</strong> Analyze the files to determine which one correctly implements the following rule: “In the backend namespace, allow ingress traffic on port 8000 to pods with label <code>role=api</code> only from pods that have the label <code>role=frontend</code>.” Apply the correct manifest file.</li>
+<li><strong>Validation:</strong> Test connectivity from a <code>frontend</code> pod to an <code>api</code> pod (should succeed) and from another pod (should fail).</li>
+</ul>
+<h3>Solution</h3>
+<p>To strictly allow traffic from a specific set of pods (<code>role=frontend</code>) to another set (<code>role=api</code>) on a specific port (<code>8000</code>), the NetworkPolicy must:</p>
+<ol>
+<li><strong>Target the destination pods</strong>: Use <code>spec.podSelector</code> to select <code>role=api</code>.</li>
+<li><strong>Define Ingress source</strong>: Use an <code>ingress</code> rule with <code>from: - podSelector</code> matching <code>role=frontend</code>.</li>
+<li><strong>Specify Port</strong>: Restrict traffic to TCP port <code>8000</code>.</li>
+</ol>
+<p><strong>Correct Manifest Structure:</strong></p>
+<p>You need to look for the manifest that uses <code>podSelector</code> (not <code>namespaceSelector</code>) in the <code>from</code> section, assuming all pods are in the same namespace.</p>
+<pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-allow-frontend
+  namespace: backend
+spec:
+  podSelector:
+    matchLabels:
+      role: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 8000
+</code></pre>
+<p><strong>Common Pitfalls in Exams:</strong></p>
+<ul>
+<li><strong>Empty PodSelector</strong>: <code>podSelector: {}</code> selects ALL pods in the namespace.</li>
+<li><strong>NamespaceSelector</strong>: Using <code>namespaceSelector</code> instead of <code>podSelector</code> in the <code>from</code> block would allow traffic from ALL pods in a specific namespace.</li>
+</ul>
+<p><strong>Action:</strong>
+Inspect the provided files (<code>cat /opt/np-1.yaml</code>, etc.) and apply the one that matches.</p>
+<pre><code class="language-bash">kubectl apply -f /opt/np-&lt;correct&gt;.yaml
+</code></pre>
+<hr />
+<h2>Question 28: Configure Pod DNS Policy</h2>
+<ul>
+<li><strong>Scenario:</strong> A legacy application pod needs to use a specific external DNS server instead of the cluster’s CoreDNS.</li>
+<li><strong>Initial State:</strong> A pod manifest <code>/opt/legacy-pod.yaml</code> exists.</li>
+<li><strong>Task:</strong> Edit the pod manifest <code>/opt/legacy-pod.yaml</code>. Set the <code>dnsPolicy</code> to <code>None</code>. Add a <code>dnsConfig</code> section that specifies <code>8.8.4.4</code> in the <code>nameservers</code> list. Create the pod.</li>
+<li><strong>Validation:</strong> Exec into the created pod and inspect the contents of <code>/etc/resolv.conf</code>. It should show <code>nameserver 8.8.4.4</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>By default, Pods inherit the cluster's DNS configuration (<code>dnsPolicy: ClusterFirst</code>), meaning they use CoreDNS to resolve Service names and external domains.
+To force a Pod to use a specific external DNS server <strong>only</strong>, you must:</p>
+<ol>
+<li>Set <code>dnsPolicy</code> to <code>None</code>.</li>
+<li>Provide the <code>dnsConfig</code> manually.</li>
+</ol>
+<p><strong>YAML Manifest:</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: legacy-pod
+spec:
+  containers:
+    - name: legacy-app
+      image: busybox:1.28
+      command: [&quot;sleep&quot;, &quot;3600&quot;]
+  # Important: Set policy to None so it doesn't use CoreDNS
+  dnsPolicy: None
+  dnsConfig:
+    nameservers:
+      - 8.8.4.4
+    searches:
+      - ns1.svc.cluster.local
+      - my.dns.search.suffix
+</code></pre>
+<p><strong>Validation:</strong></p>
+<pre><code class="language-bash">kubectl apply -f /opt/legacy-pod.yaml
+
+# Check resolv.conf inside the pod
+kubectl exec legacy-pod -- cat /etc/resolv.conf
+# Output should contain:
+# nameserver 8.8.4.4
+</code></pre>
+<hr />
+<h2>Question 29: Use a LoadBalancer Service</h2>
+<ul>
+<li><strong>Scenario:</strong> An application needs to be exposed to the internet using a cloud provider’s load balancer.</li>
+<li><strong>Initial State:</strong> A Deployment <code>public-api</code> is running. The environment is a simulated cloud environment.</li>
+<li><strong>Task:</strong> Create a Service named <code>api-lb</code> of type <code>LoadBalancer</code>. It should target the <code>public-api</code> pods on port <code>8080</code>.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get service api-lb</code>. After a moment, an <code>EXTERNAL-IP</code> should be assigned by the simulated cloud provider.</li>
+</ul>
+<h3>Solution</h3>
+<p>A <code>LoadBalancer</code> Service exposes the Service externally using a cloud provider's load balancer. NodePort and ClusterIP services are automatically created, and the external load balancer routes to them.</p>
+<p><strong>Imperative Creation:</strong></p>
+<pre><code class="language-bash">kubectl create service loadbalancer api-lb --tcp=8080:8080 --dry-run=client -o yaml &gt; lb.yaml
+</code></pre>
+<p><em>Note: The imperative command assumes a selector <code>app=api-lb</code>, so you will likely need to edit the YAML to match the actual Deployment labels.</em></p>
+<p><strong>YAML Manifest:</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: api-lb
+spec:
+  selector:
+    app: public-api # Must match the deployment labels
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+</code></pre>
+<p><strong>Validation:</strong></p>
+<pre><code class="language-bash">kubectl apply -f lb.yaml
+kubectl get svc api-lb
+# Wait for the EXTERNAL-IP to change from &lt;pending&gt; to an IP address.
+</code></pre>
+<hr />
+<h2>Question 30: Modify CoreDNS for Custom Domains</h2>
+<ul>
+<li><strong>Scenario:</strong> You need CoreDNS to resolve a custom domain <code>internal.corp</code> to a specific IP address.</li>
+<li><strong>Initial State:</strong> CoreDNS is running.</li>
+<li><strong>Task:</strong> Edit the <code>coredns</code> ConfigMap in the <code>kube-system</code> namespace. Add a <code>hosts</code> block to the Corefile configuration that maps <code>service.internal.corp</code> to the IP <code>10.0.5.20</code>. Restart the CoreDNS pods.</li>
+<li><strong>Validation:</strong> Exec into a test pod and run <code>nslookup service.internal.corp</code>. It should resolve to <code>10.0.5.20</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>CoreDNS configuration is stored in a ConfigMap named <code>coredns</code> in the <code>kube-system</code> namespace. You can modify the <code>Corefile</code> within this ConfigMap to add custom DNS entries using the <code>hosts</code> plugin.</p>
+<p><strong>Step 1: Edit the ConfigMap</strong></p>
+<pre><code class="language-bash">kubectl edit configmap coredns -n kube-system
+</code></pre>
+<p>Add the <code>hosts</code> block inside the main <code>.:53 { ... }</code> block:</p>
+<pre><code class="language-text">    hosts {
+       10.0.5.20 service.internal.corp
+       fallthrough
+    }
+</code></pre>
+<p><em>Note: The format is <code>&lt;IP&gt; &lt;HOSTNAME&gt;</code>.</em></p>
+<p><strong>Step 2: Restart CoreDNS</strong></p>
+<p>For the changes to take effect immediately, restart the CoreDNS pods.</p>
+<pre><code class="language-bash">kubectl rollout restart deployment coredns -n kube-system
+</code></pre>
+<p><strong>Validation:</strong></p>
+<pre><code class="language-bash"># Run a temporary pod to test resolution
+kubectl run dns-test --image=busybox:1.28 --rm -it -- nslookup service.internal.corp
+</code></pre>
+<hr />
+<h2>Domain: Workloads &amp; Scheduling (10 Questions)</h2>
+<h2>Question 31: Configure a Horizontal Pod Autoscaler</h2>
+<ul>
+<li><strong>Scenario:</strong> A CPU-intensive workload needs to scale automatically based on load.</li>
+<li><strong>Initial State:</strong> A Deployment named <code>processor</code> is running. The pods in the deployment have CPU resource requests set.</li>
+<li><strong>Task:</strong> Create a HorizontalPodAutoscaler named <code>processor-hpa</code>. It should target the <code>processor</code> Deployment, maintain a minimum of 2 and a maximum of 6 replicas, and scale up when the average CPU utilization across pods exceeds 60%.</li>
+<li><strong>Validation:</strong> Run <code>kubectl describe hpa processor-hpa</code> to verify its configuration.</li>
+</ul>
+<p>Here is the YAML manifest for <strong>Question 31 – Horizontal Pod Autoscaler</strong>:</p>
+<pre><code class="language-yaml">apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: processor-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: processor
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+</code></pre>
+<p>Imperative Commands for Question 31 (Deployment + HPA)</p>
+<pre><code class="language-bash">kubectl autoscale deployment processor \
+  --cpu-percent=60 \
+  --min=2 \
+  --max=6
+</code></pre>
+<hr />
+<h2>Question 32: Calculate and Set Resource Limits</h2>
+<ul>
+<li><strong>Scenario:</strong> A Deployment is causing instability by consuming too many resources on a node. You need to constrain it based on available node capacity.</li>
+<li><strong>Initial State:</strong> A node <code>worker-1</code> has 2000m of allocatable CPU and 4Gi of allocatable memory. A Deployment <code>resource-hog</code> with 2 replicas is running on it.</li>
+<li><strong>Task:</strong> Calculate resource limits for the <code>resource-hog</code> pods. Each pod should be limited to <code>400m</code> CPU and <code>512Mi</code> of memory. Edit the <code>resource-hog</code> Deployment and set these values in the <code>resources.limits</code> section of the container spec.</li>
+<li><strong>Validation:</strong> Describe one of the <code>resource-hog</code> pods and verify that the CPU and memory limits are correctly set.</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-hog
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resource-hog
+  template:
+    metadata:
+      labels:
+        app: resource-hog
+    spec:
+      containers:
+        - name: resource-hog
+          image: your-image-here
+          resources:
+            limits:
+              cpu: &quot;400m&quot;
+              memory: &quot;512Mi&quot;
+            requests:
+              cpu: &quot;400m&quot;
+              memory: &quot;512Mi&quot;
+</code></pre>
+<hr />
+<h2>Question 33: Use a PriorityClass for a Critical Pod</h2>
+<ul>
+<li><strong>Scenario:</strong> A critical monitoring agent must be scheduled even if the cluster is under high load.</li>
+<li><strong>Initial State:</strong> A pod manifest <code>/opt/agent.yaml</code> exists.</li>
+<li><strong>Task:</strong> Create a <code>PriorityClass</code> named <code>high-priority</code> with a value of <code>1000000</code>. Edit the pod manifest <code>/opt/agent.yaml</code> to use this priority class by setting the <code>priorityClassName</code> field to <code>high-priority</code>. Create the pod.</li>
+<li><strong>Validation:</strong> Describe the created pod and verify that the <strong>Priority Class</strong> field is set to <code>high-priority</code>.</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 1000000
+globalDefault: false
+description: &quot;This priority class is for critical monitoring agents&quot;
+</code></pre>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: critical-agent
+spec:
+  priorityClassName: high-priority
+  containers:
+    - name: agent
+      image: busybox
+      command: [&quot;sh&quot;, &quot;-c&quot;, &quot;while true; do echo running; sleep 5; done&quot;]
+</code></pre>
+<pre><code class="language-bash">kubectl describe pod critical-agent | grep -i Priority
+</code></pre>
+<hr />
+<h2>Question 34: Add a Sidecar Container</h2>
+<ul>
+<li><strong>Scenario:</strong> An existing application pod needs a sidecar container to stream its logs to a central service.</li>
+<li><strong>Initial State:</strong> A Deployment <code>main-app</code> is running. The application writes logs to <code>/var/log/app.log</code> inside a volume.</li>
+<li><strong>Task:</strong> Edit the <code>main-app</code> Deployment. Add a new container to the pod spec named <code>log-streamer</code> using the <code>busybox</code> image. The new container should run the command <code>tail -f /var/log/app.log</code>. Mount the same log volume that the main application uses into this new sidecar container.</li>
+<li><strong>Validation:</strong> Describe one of the pods from the <code>main-app</code> Deployment. It should show two containers: the main app container and the <code>log-streamer</code>.</li>
+</ul>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: main-app
+  template:
+    metadata:
+      labels:
+        app: main-app
+    spec:
+      containers:
+        - name: main-app
+          image: nginx:1.17.0
+          volumeMounts:
+            - name: log-volume
+              mountPath: /var/log/
+          resources:
+            requests:
+              memory: &quot;64Mi&quot;
+              cpu: &quot;256m&quot;
+            limits:
+              memory: &quot;128Mi&quot;
+              cpu: &quot;512m&quot;
+        - name: log-streamer
+          image: busybox
+          command: [&quot;sh&quot;, &quot;-c&quot;, &quot;tail -f /var/log/app.log&quot;]
+          volumeMounts:
+            - name: log-volume
+              mountPath: /var/log/
+          resources:
+            requests:
+              memory: &quot;64Mi&quot;
+              cpu: &quot;256m&quot;
+            limits:
+              memory: &quot;128Mi&quot;
+              cpu: &quot;512m&quot;
+      volumes:
+        - name: log-volume
+          emptyDir: {}
+</code></pre>
+<hr />
+<h2>Question 35: Perform a Rolling Update and Rollback</h2>
+<ul>
+<li><strong>Scenario:</strong> You need to update an application to a new version and then roll it back due to a reported bug.</li>
+<li><strong>Initial State:</strong> A Deployment <code>frontend</code> is running version <code>1.0</code> of an application image.</li>
+<li><strong>Task:</strong> Update the <code>frontend</code> Deployment to use image version <code>1.1</code>. After the update completes, perform a rollback to the previous version.</li>
+<li><strong>Validation:</strong> Run <code>kubectl rollout history deployment frontend</code> to see the revision history. After the rollback, describe the deployment and verify that it is using image version <code>1.0</code> again.</li>
+</ul>
+<p>To Update:</p>
+<pre><code class="language-bash">kubectl set image deployment/frontend frontend-container=your-image:1.1
+kubectl rollout status deployment/frontend
+</code></pre>
+<p>To Rollback:</p>
+<pre><code class="language-bash">kubectl rollout undo deployment/frontend
+kubectl rollout status deployment/frontend
+</code></pre>
+<p>To Validate:</p>
+<pre><code class="language-bash">kubectl rollout history deployment frontend
+kubectl describe deployment frontend | grep Image
+</code></pre>
+<hr />
+<h2>Question 36: Use a ConfigMap to Configure an Application</h2>
+<ul>
+<li><strong>Scenario:</strong> An NGINX pod needs to be configured with a custom <code>nginx.conf</code> file.</li>
+<li><strong>Initial State:</strong> A file <code>/opt/nginx.conf</code> exists with custom settings.</li>
+<li><strong>Task:</strong> Create a ConfigMap named <code>nginx-config</code> from the file <code>/opt/nginx.conf</code>. Then, create a pod that runs the <code>nginx</code> image. Mount the <code>nginx-config</code> ConfigMap as a volume into the pod at the path <code>/etc/nginx/nginx.conf</code>, overwriting the default configuration file.</li>
+<li><strong>Validation:</strong> Exec into the pod and run <code>cat /etc/nginx/nginx.conf</code>. The content should match the custom file from <code>/opt/nginx.conf</code>.</li>
+</ul>
+<p>Solution for Question 36: Use a ConfigMap to Configure an Application</p>
+<p><strong>Step 1: Create the ConfigMap from the file</strong></p>
+<pre><code class="language-bash">kubectl create configmap nginx-config --from-file=nginx.conf=/opt/nginx.conf
+</code></pre>
+<p><strong>Step 2: Create the Pod Manifest</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-custom
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+  volumes:
+    - name: nginx-config-volume
+      configMap:
+        name: nginx-config
+        items:
+          - key: nginx.conf
+            path: nginx.conf
+</code></pre>
+<p><strong>Step 3: Apply the Pod Manifest</strong></p>
+<pre><code class="language-bash">kubectl apply -f nginx-pod.yaml
+</code></pre>
+<p><strong>Validation</strong></p>
+<pre><code class="language-bash">kubectl exec -it nginx-custom -- cat /etc/nginx/nginx.conf
+</code></pre>
+<p>You should see the contents of <code>/opt/nginx.conf</code>.</p>
+<hr />
+<h2>Question 37: Use a Secret for Environment Variables</h2>
+<ul>
+<li><strong>Scenario:</strong> An application requires a database password, which must be supplied securely as an environment variable.</li>
+<li><strong>Initial State:</strong> A pod manifest <code>/opt/app-pod.yaml</code> exists.</li>
+<li><strong>Task:</strong> Create a generic Secret named <code>db-secret</code> with a key <code>DB_PASSWORD</code> and a value of <code>s3cr3tP@ssw0rd</code>. Edit the pod manifest <code>/opt/app-pod.yaml</code> to expose the <code>DB_PASSWORD</code> key from the <code>db-secret</code> as an environment variable named <code>DATABASE_PASSWORD</code> in the container. Create the pod.</li>
+<li><strong>Validation:</strong> Exec into the pod and run <code>env | grep DATABASE_PASSWORD</code>. It should show <code>DATABASE_PASSWORD=s3cr3tP@ssw0rd</code>.</li>
+</ul>
+<p>Solution for Question 37: Use a Secret for Environment Variables</p>
+<p><strong>Step 1: Create the Secret</strong></p>
+<pre><code class="language-bash">kubectl create secret generic db-secret \
+  --from-literal=DB_PASSWORD=s3cr3tP@ssw0rd
+</code></pre>
+<p><strong>Step 2: Edit <code>/opt/app-pod.yaml</code> to include the Secret as an environment variable</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+    - name: app-container
+      image: your-application-image
+      env:
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: DB_PASSWORD
+</code></pre>
+<p><strong>Step 3: Apply the manifest</strong></p>
+<pre><code class="language-bash">kubectl apply -f /opt/app-pod.yaml
+</code></pre>
+<p><strong>Validation</strong></p>
+<pre><code class="language-bash">kubectl exec -it app-pod -- env | grep DATABASE_PASSWORD
+</code></pre>
+<p>Expected output:</p>
+<pre><code>DATABASE_PASSWORD=s3cr3tP@ssw0rd
+</code></pre>
+<hr />
+<h2>Question 38: Configure Node Affinity</h2>
+<ul>
+<li><strong>Scenario:</strong> A specific workload must only run on nodes that have high-performance SSD storage.</li>
+<li><strong>Initial State:</strong> Some worker nodes have the label <code>disktype=ssd</code>. A Deployment manifest <code>/opt/workload.yaml</code> exists.</li>
+<li><strong>Task:</strong> Edit the Deployment manifest <code>/opt/workload.yaml</code>. Add a <code>nodeAffinity</code> rule under <code>spec.template.spec.affinity</code>. The rule should be a <code>requiredDuringSchedulingIgnoredDuringExecution</code> type that requires nodes to have the label <code>disktype</code> with the value <code>ssd</code>. Apply the manifest.</li>
+<li><strong>Validation:</strong> Check which nodes the deployment’s pods are running on using <code>kubectl get pods -o wide</code>. All pods should be on nodes with the <code>disktype=ssd</code> label.</li>
+</ul>
+<pre><code class="language-bash">k label node cka-multinode-m03 disktype=ssd
+</code></pre>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ssd-affinity
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - image: nginx
+          name: blue
+          resources:
+            requests:
+              memory: &quot;64Mi&quot;
+              cpu: &quot;256m&quot;
+            limits:
+              memory: &quot;128Mi&quot;
+              cpu: &quot;512m&quot;
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: disktype
+                    operator: In
+                    values:
+                      - ssd
+</code></pre>
+<hr />
+<h2>Question 39: Configure Taints and Tolerations</h2>
+<ul>
+<li><strong>Scenario:</strong> A specific node is reserved for GPU workloads and should not accept normal pods.</li>
+<li><strong>Initial State:</strong> A node <code>gpu-node-1</code> exists. A pod manifest <code>/opt/gpu-pod.yaml</code> exists.</li>
+<li><strong>Task:</strong> Add a taint to the <code>gpu-node-1</code> node with the key <code>gpu</code>, value <code>true</code>, and effect <code>NoSchedule</code>. Then, edit the pod manifest <code>/opt/gpu-pod.yaml</code> to add a toleration for this taint (<code>key: "gpu"</code>, <code>operator: "Exists"</code>, <code>effect: "NoSchedule"</code>). Create the pod.</li>
+<li><strong>Validation:</strong> The <code>gpu-pod</code> should be successfully scheduled on <code>gpu-node-1</code>. A normal pod without the toleration should not be scheduled on that node.</li>
+</ul>
+<pre><code class="language-bash"># Add taint to the node
+kubectl taint nodes gpu-node-1 gpu=true:NoSchedule
+</code></pre>
+<p>Edit the pod manifest /opt/gpu-pod.yaml</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod
+spec:
+  tolerations:
+    - key: &quot;gpu&quot;
+      operator: &quot;Exists&quot;
+      effect: &quot;NoSchedule&quot;
+  containers:
+    - name: gpu-container
+      image: nginx
+</code></pre>
+<pre><code class="language-bash"># Create the pod
+kubectl apply -f /opt/gpu-pod.yaml
+</code></pre>
+<p><strong>Validation</strong></p>
+<pre><code class="language-bash">kubectl get pods -o wide
+kubectl describe pod gpu-pod
+</code></pre>
+<p>**The Issue: Taints vs. Affinity
+You are assuming that a Toleration attracts a Pod to a specific Node. It does not.</p>
+<p>Taints are Repulsive: They say "Do not come here unless you have a pass."
+Tolerations are Permission Slips: They say "I have a pass to enter if I need to," but they do not say "I must go there."
+Affinity is Attractive: This is what says "I want to go to this specific node."</p>
+<hr />
+<h2>Question 40: Create a StatefulSet</h2>
+<ul>
+<li><strong>Scenario:</strong> Deploy a stateful application that requires stable network identifiers and persistent storage.</li>
+<li><strong>Initial State:</strong> A headless service <code>app-headless</code> and a StorageClass <code>fast-storage</code> exist.</li>
+<li><strong>Task:</strong> Create a StatefulSet named <code>data-app</code> with 2 replicas. It should use the <code>app-headless</code> service for its <code>serviceName</code>. The pod template should use the <code>nginx</code> image. Define a <code>volumeClaimTemplate</code> that creates a 1Gi PVC for each replica using the <code>fast-storage</code> StorageClass.</li>
+<li><strong>Validation:</strong> Verify that two pods, <code>data-app-0</code> and <code>data-app-1</code>, are created and running. Verify that two corresponding PVCs have also been created and bound.</li>
+</ul>
+<hr />
+<h2>Domain: Storage (10 Questions)</h2>
+<h2>Question 41: Create a PVC and Mount it in a Pod</h2>
+<ul>
+<li><strong>Scenario:</strong> An application needs a persistent volume to store its data.</li>
+<li><strong>Initial State:</strong> A default StorageClass is configured in the cluster.</li>
+<li><strong>Task:</strong> Create a PersistentVolumeClaim named <code>my-pvc</code> that requests <code>1Gi</code> of storage with the <code>ReadWriteOnce</code> access mode. Then, create a pod named <code>storage-pod</code> that mounts this PVC at the path <code>/data</code>.</li>
+<li><strong>Validation:</strong> Exec into the <code>storage-pod</code> and create a file in the <code>/data</code> directory. Delete the pod. Recreate the pod. Exec into the new pod and verify that the file still exists in <code>/data</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>This question tests your ability to dynamically provision storage using a PersistentVolumeClaim (PVC) and mount it into a Pod. Since a default StorageClass exists, you only need to create the PVC, and the cluster will automatically create the backing PV.</p>
+<p><strong>1. Create the PersistentVolumeClaim (PVC):</strong></p>
+<p>Create a file named <code>my-pvc.yaml</code>:</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+</code></pre>
+<p><strong>2. Create the Pod:</strong></p>
+<p>Create a file named <code>storage-pod.yaml</code>. Note the <code>volumes</code> and <code>volumeMounts</code> sections.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: storage-pod
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: [&quot;sleep&quot;, &quot;3600&quot;]
+      volumeMounts:
+        - mountPath: &quot;/data&quot;
+          name: my-data
+  volumes:
+    - name: my-data
+      persistentVolumeClaim:
+        claimName: my-pvc
+</code></pre>
+<p><strong>3. Apply the Manifests:</strong></p>
+<pre><code class="language-bash">kubectl apply -f my-pvc.yaml
+kubectl apply -f storage-pod.yaml
+</code></pre>
+<p><strong>4. Validation:</strong></p>
+<p>Verify the PVC is bound:</p>
+<pre><code class="language-bash">kubectl get pvc my-pvc
+# STATUS should be 'Bound'
+</code></pre>
+<p>Test Data Persistence:</p>
+<pre><code class="language-bash"># 1. Write data
+kubectl exec storage-pod -- sh -c &quot;echo 'Hello Storage' &gt; /data/file.txt&quot;
+
+# 2. Delete the pod (data stays in PVC/PV)
+kubectl delete pod storage-pod
+
+# 3. Recreate the pod
+kubectl apply -f storage-pod.yaml
+
+# 4. Verify data exists
+kubectl exec storage-pod -- cat /data/file.txt
+# Output should be 'Hello Storage'
+</code></pre>
+<p><strong>Note on Physical Storage (Minikube):</strong>
+Since you are using the default <code>standard</code> StorageClass in Minikube, it uses the <code>hostPath</code> provisioner. The actual files are stored on the Minikube node (not your local laptop's filesystem) at a path like <code>/tmp/hostpath-provisioner/default/my-pvc</code>. You can verify this by SSHing into the node (<code>minikube ssh</code>) and checking that directory.</p>
+<hr />
+<h2>Question 42: Patch a StorageClass to be the Default</h2>
+<ul>
+<li><strong>Scenario:</strong> The cluster has two StorageClasses, <code>slow</code> and <code>fast</code>, but neither is the default. You need to make <code>fast</code> the default for all new PVCs.</li>
+<li><strong>Initial State:</strong> Two StorageClasses, <code>slow</code> and <code>fast</code>, exist.</li>
+<li><strong>Task:</strong> Use the <code>kubectl patch</code> command to add the annotation <code>storageclass.kubernetes.io/is-default-class="true"</code> to the <code>fast</code> StorageClass. Ensure the <code>slow</code> StorageClass does not have this annotation.</li>
+<li><strong>Validation:</strong> Create a new PVC without specifying a <code>storageClassName</code>. Describe the PVC and verify that it was provisioned using the <code>fast</code> StorageClass.</li>
+</ul>
+<h3>Solution</h3>
+<p>To set a StorageClass as the default, you need to add the specific annotation <code>storageclass.kubernetes.io/is-default-class: "true"</code>. This can be done using the <code>kubectl patch</code> command.</p>
+<p><strong>1. Check Current StorageClasses:</strong></p>
+<pre><code class="language-bash">kubectl get sc
+# You should see 'slow' and 'fast' (and likely 'standard').
+</code></pre>
+<p><strong>2. Patch 'fast' to be Default:</strong></p>
+<pre><code class="language-bash">kubectl patch storageclass standard -p '{&quot;metadata&quot;: {&quot;annotations&quot;:{&quot;storageclass.kubernetes.io/is-default-class&quot;:&quot;true&quot;}}}'
+</code></pre>
+<p><em>Note: If another class (like <code>standard</code>) is already marked as default, you might want to remove its default status to avoid confusion, though Kubernetes usually picks the one most recently marked or warns if multiple exist.</em></p>
+<p><strong>3. Ensure 'slow' is NOT Default:</strong></p>
+<p>If <code>slow</code> was previously default, you would remove the annotation or set it to false:</p>
+<pre><code class="language-bash">kubectl patch storageclass slow -p '{&quot;metadata&quot;: {&quot;annotations&quot;:{&quot;storageclass.kubernetes.io/is-default-class&quot;:&quot;false&quot;}}}'
+</code></pre>
+<p><strong>4. Validation:</strong></p>
+<p>Verify the output of <code>get sc</code>:</p>
+<pre><code class="language-bash">kubectl get sc
+# The 'fast' class should now display '(default)' next to its name.
+</code></pre>
+<p>Create a PVC without specifying a ConfigMap:</p>
+<pre><code class="language-yaml"># test-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-default-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+</code></pre>
+<pre><code class="language-bash">kubectl apply -f test-pvc.yaml
+kubectl get pvc test-default-pvc
+kubectl describe pvc test-default-pvc | grep &quot;StorageClass&quot;
+# Should show: StorageClass: fast
+</code></pre>
+<p><strong>Common Issue: Pending PVC</strong>
+If the PVC remains in <code>Pending</code> state with "no persistent volumes available for this claim and no storage class is set":</p>
+<ol>
+<li><strong>Cause</strong>: The PVC yaml likely has <code>storageClassName: ""</code> which explicitly disables dynamic provisioning.</li>
+<li><strong>Fix</strong>: Remove the <code>storageClassName</code> field (or set it to <code>null</code>) to allow the default StorageClass to take over.</li>
+<li><strong>Note</strong>: PVC <code>spec</code> is immutable. You cannot edit the field on an existing PVC. <strong>You must delete and recreate the PVC.</strong></li>
+</ol>
+<hr />
+<h2>Question 43: Create a PVC to Bind to a Specific PV</h2>
+<ul>
+<li><strong>Scenario:</strong> A PersistentVolume named <code>pv-data-001</code> was created manually, and you need to create a claim that specifically binds to it.</li>
+<li><strong>Initial State:</strong> A PV named <code>pv-data-001</code> exists with a capacity of <code>2Gi</code>, access mode <code>ReadWriteOnce</code>, and <code>storageClassName</code> of <code>manual</code>.</li>
+<li><strong>Task:</strong> Create a PersistentVolumeClaim named <code>claim-for-pv-data</code> that exactly matches the specifications of <code>pv-data-001</code> (requests 2Gi storage, ReadWriteOnce access mode, and <code>storageClassName: manual</code>) to ensure it binds to that specific PV.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get pvc claim-for-pv-data</code>. Its status should be <code>Bound</code>, and describing it should show it is bound to the <code>pv-data-001</code> volume.</li>
+</ul>
+<h3>Solution</h3>
+<p>This question tests your understanding of static provisioning and how PVCs bind to specific PVs based on matching criteria (Capacity, Access Mode, and Storage Class).</p>
+<p><strong>Step 1: Setup - Create the Initial PV (Pre-requisite)</strong>
+First, create the Persistent Volume as described in the "Initial State".</p>
+<pre><code class="language-bash">cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-data-001
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: &quot;/tmp/data-001&quot;
+EOF
+</code></pre>
+<p><strong>Step 2: Create the PVC</strong>
+Create a PVC that requests specific resources matching the PV. Crucially, the <code>storageClassName</code> must match.</p>
+<pre><code class="language-bash">cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-for-pv-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: manual
+EOF
+</code></pre>
+<p><strong>Step 3: Validation</strong></p>
+<p>Check if the PVC is bound to the correct PV.</p>
+<pre><code class="language-bash"># Check status - should be &quot;Bound&quot;
+kubectl get pvc claim-for-pv-data
+
+# Verify it is bound to 'pv-data-001'
+kubectl describe pvc claim-for-pv-data | grep &quot;Volume:&quot;
+# Output should show: Volume: pv-data-001
+</code></pre>
+<hr />
+<h2>Question 44: Configure Volume Reclaim Policy</h2>
+<ul>
+<li><strong>Scenario:</strong> You are creating a PersistentVolume for temporary data and want the underlying storage to be deleted when the claim is released.</li>
+<li><strong>Initial State:</strong> A manifest for a PV is at <code>/opt/pv.yaml</code>.</li>
+<li><strong>Task:</strong> Edit the PV manifest at <code>/opt/pv.yaml</code>. Set the <code>persistentVolumeReclaimPolicy</code> field to <code>Delete</code>. Create the PV.</li>
+<li><strong>Validation:</strong> Create a PVC that binds to this PV. Then, delete the PVC. The PV's status should change to <code>Terminating</code> and it should eventually be deleted.</li>
+</ul>
+<h3>Solution</h3>
+<p>The <code>persistentVolumeReclaimPolicy</code> controls what happens to a PersistentVolume when its bound PVC is deleted.</p>
+<ul>
+<li><strong>Retain</strong>: (Default for manual PVs) The PV is released but keeps the data. It requires manual cleanup.</li>
+<li><strong>Delete</strong>: (Default for dynamic provisioning) The PV is deleted along with the underlying storage.</li>
+<li><strong>Recycle</strong>: (Deprecated) Performs a basic scrub (rm -rf).</li>
+</ul>
+<p><strong>Step 1: Define the PV with Reclaim Policy 'Delete'</strong></p>
+<p>Create or edit <code>/opt/pv.yaml</code>.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: temp-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  # This is the key setting
+  persistentVolumeReclaimPolicy: Delete
+  hostPath:
+    path: /tmp/temp-data
+</code></pre>
+<p>Apply it:</p>
+<pre><code class="language-bash">kubectl apply -f /opt/pv.yaml
+</code></pre>
+<p><strong>Step 2: Create a PVC to bind to it</strong></p>
+<p>To test it, we need a PVC that will bind to this specific PV. We can use a selector or just match the attributes.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: temp-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  # Ensure this is empty to match the PV if it doesn't have a class,
+  # or match the PV's class if it has one.
+  storageClassName: &quot;&quot;
+</code></pre>
+<p><strong>Step 3: Validation (The Delete Test)</strong></p>
+<pre><code class="language-bash"># 1. Create resources
+kubectl apply -f /opt/pv.yaml
+kubectl apply -f temp-pvc.yaml
+
+# 2. Verify binding
+kubectl get pv temp-pv
+# Status should be Bound
+
+# 3. Delete the PVC
+kubectl delete pvc temp-pvc
+
+# 4. Check the PV again
+kubectl get pv temp-pv
+# It should be gone (or briefly Terminating)
+</code></pre>
+<hr />
+<h2>Question 45: Expand a Persistent Volume Claim</h2>
+<ul>
+<li><strong>Scenario:</strong> An application's database is running out of space, and the underlying storage volume needs to be expanded.</li>
+<li><strong>Initial State:</strong> A StorageClass <code>expandable-sc</code> with <code>allowVolumeExpansion: true</code> exists. A PVC <code>db-pvc</code> created with this class is currently <code>10Gi</code>.</li>
+<li><strong>Task:</strong> Edit the <code>db-pvc</code> PersistentVolumeClaim and change the <code>spec.resources.requests.storage</code> value from <code>10Gi</code> to <code>20Gi</code>.</li>
+<li><strong>Validation:</strong> Run <code>kubectl describe pvc db-pvc</code>. Check the events to see a successful resize operation. The capacity of the PVC should now show <code>20Gi</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>This question tests your ability to expand Persistent Volumes. This feature must be enabled in the StorageClass via <code>allowVolumeExpansion: true</code>. The minikube <code>standard</code> class usually has this enabled (or we can patch it).</p>
+<p><strong>Step 1: Setup - Create StorageClass and PVC (Pre-requisite)</strong></p>
+<pre><code class="language-bash"># 1. Create a StorageClass that allows expansion
+cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: expandable-sc
+provisioner: k8s.io/minikube-hostpath
+allowVolumeExpansion: true
+EOF
+
+# 2. Create the initial PVC
+cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: expandable-sc
+  resources:
+    requests:
+      storage: 10Gi
+EOF
+</code></pre>
+<p><strong>Step 2: Expand the PVC</strong></p>
+<p>You can do this via <code>kubectl edit</code> or patching.</p>
+<pre><code class="language-bash">kubectl patch pvc db-pvc -p '{&quot;spec&quot;:{&quot;resources&quot;:{&quot;requests&quot;:{&quot;storage&quot;:&quot;20Gi&quot;}}}}'
+</code></pre>
+<p>Alternatively, open the editor:</p>
+<pre><code class="language-bash">kubectl edit pvc db-pvc
+# Change storage: 10Gi to 20Gi
+</code></pre>
+<p><strong>Step 3: Validation</strong></p>
+<pre><code class="language-bash"># Check the status
+kubectl get pvc db-pvc
+# Look for CAPACITY 20Gi (It usually happens instantly on hostPath)
+
+# Check events for confirmation
+kubectl describe pvc db-pvc
+# Look for: FileSystemResizeForSuccessful
+</code></pre>
+<blockquote>
+<p><strong>Note</strong>: For some storage types, the resize only happens <em>after</em> a Pod using the PVC is restarted or the filesystem is mounted. For <code>hostPath</code> (minikube), it is usually immediate.</p>
+</blockquote>
+<hr />
+<h2>Question 46: Use a HostPath Volume</h2>
+<ul>
+<li><strong>Scenario:</strong> A pod needs to access logs stored directly on the node's filesystem for debugging.</li>
+<li><strong>Initial State:</strong> A log file exists at <code>/var/log/node-app.log</code> on a worker node.</li>
+<li><strong>Task:</strong> Create a pod that uses a <code>hostPath</code> volume to mount the <code>/var/log</code> directory from the host node into the pod at the path <code>/node-logs</code>. The pod should be scheduled to the specific worker node where the log file exists.</li>
+<li><strong>Validation:</strong> Exec into the pod and run <code>cat /node-logs/node-app.log</code>. It should display the contents of the log file from the host node.</li>
+</ul>
+<h3>Solution</h3>
+<p>This question covers mounting a directory from the underlying node into a Pod using <code>hostPath</code>. This is often used for system agents or debugging but has security implications (the Pod can read/write host files).</p>
+<p><strong>Step 1: Identify the Node</strong></p>
+<p>Find the node name you want to schedule on.</p>
+<pre><code class="language-bash">kubectl get nodes
+# Assume node is 'worker-node-1' / 'minikube'
+</code></pre>
+<p><strong>Step 2: Create the Pod Manifest</strong></p>
+<p>Use <code>nodeName</code> to force scheduling to that specific node.</p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: hostpath-pod
+spec:
+  # Force scheduling to the node where the log file is
+  nodeName: minikube # Change this to your actual node name
+  containers:
+    - name: logs-viewer
+      image: busybox
+      command: [&quot;sleep&quot;, &quot;3600&quot;]
+      volumeMounts:
+        - mountPath: /node-logs
+          name: log-volume
+  volumes:
+    - name: log-volume
+      hostPath:
+        path: /var/log
+        type: Directory
+</code></pre>
+<p><strong>Step 3: Validation</strong></p>
+<p>First, ensure the dummy file exists on the node (Minikube example):</p>
+<pre><code class="language-bash">minikube ssh &quot;sudo touch /var/log/node-app.log &amp;&amp; echo 'Host Log Content' | sudo tee /var/log/node-app.log&quot;
+</code></pre>
+<p>Then create and check the pod:</p>
+<pre><code class="language-bash">kubectl apply -f hostpath-pod.yaml
+
+# Read the file from inside the pod
+kubectl exec hostpath-pod -- cat /node-logs/node-app.log
+# Output: Host Log Content
+</code></pre>
+<hr />
+<h2>Question 47: Use an emptyDir Volume for Temporary Data</h2>
+<ul>
+<li><strong>Scenario:</strong> Two containers in a pod need to share temporary files.</li>
+<li><strong>Initial State:</strong> A pod manifest <code>/opt/multi-container-pod.yaml</code> defines two containers.</li>
+<li><strong>Task:</strong> Edit the pod manifest. Define an <code>emptyDir</code> volume named <code>shared-data</code>. Mount this volume into both containers at the path <code>/shared</code>. Create the pod.</li>
+<li><strong>Validation:</strong> Exec into the first container and create a file in <code>/shared</code>. Then, exec into the second container and verify that the file is visible and accessible at <code>/shared</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>This scenario demonstrates the sidecar pattern where containers in the same Pod share a filesystem. <code>emptyDir</code> creates a temporary directory that exists as long as the Pod is running.</p>
+<p><strong>Step 1: Create the Pod Manifest</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-pod
+spec:
+  containers:
+    - name: c1
+      image: busybox
+      command: [&quot;sleep&quot;, &quot;3600&quot;]
+      volumeMounts:
+        - name: shared-data
+          mountPath: /shared
+    - name: c2
+      image: busybox
+      command: [&quot;sleep&quot;, &quot;3600&quot;]
+      volumeMounts:
+        - name: shared-data
+          mountPath: /shared
+  volumes:
+    - name: shared-data
+      emptyDir: {}
+</code></pre>
+<p><strong>Step 2: Apply and Validate</strong></p>
+<pre><code class="language-bash"># Apply
+kubectl apply -f multi-container-pod.yaml
+
+# Create a file in container 1
+kubectl exec multi-container-pod -c c1 -- sh -c &quot;echo 'Shared Data' &gt; /shared/data.txt&quot;
+
+# Read the file from container 2
+kubectl exec multi-container-pod -c c2 -- cat /shared/data.txt
+# Output should be: Shared Data
+</code></pre>
+<hr />
+<h2>Question 48: Create a Read-Only Volume Mount</h2>
+<ul>
+<li><strong>Scenario:</strong> A pod needs to read configuration data from a ConfigMap, but it must be prevented from modifying the data.</li>
+<li><strong>Initial State:</strong> A ConfigMap <code>app-config</code> exists.</li>
+<li><strong>Task:</strong> Create a pod. Mount the <code>app-config</code> ConfigMap as a volume. In the <code>volumeMounts</code> section for the container, set the <code>readOnly</code> field to <code>true</code>.</li>
+<li><strong>Validation:</strong> Exec into the pod and attempt to write a file to the mounted config directory (e.g., <code>touch /path/to/config/new-file</code>). The command should fail with a "Read-only file system" error.</li>
+</ul>
+<h3>Solution</h3>
+<p>Mounting volumes as <code>readOnly</code> is a best practice for configuration data (ConfigMaps/Secrets) to ensure immutability from the application's perspective.</p>
+<p><strong>Step 1: Create the ConfigMap (Pre-requisite)</strong></p>
+<pre><code class="language-bash">kubectl create configmap app-config --from-literal=config.json='{&quot;debug&quot;:true}'
+</code></pre>
+<p><strong>Step 2: Create the Pod with ReadOnly Mount</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: readonly-pod
+spec:
+  containers:
+    - name: app
+      image: busybox
+      command: [&quot;sleep&quot;, &quot;3600&quot;]
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+          readOnly: true
+  volumes:
+    - name: config-volume
+      configMap:
+        name: app-config
+</code></pre>
+<p><strong>Step 3: Validation</strong></p>
+<pre><code class="language-bash">kubectl apply -f readonly-pod.yaml
+
+# Try to write to the mount path
+kubectl exec readonly-pod -- touch /etc/config/hack.txt
+# Output should be: touch: /etc/config/hack.txt: Read-only file system
+</code></pre>
+<hr />
+<h2>Question 49: Manually Create a PersistentVolume</h2>
+<ul>
+<li><strong>Scenario:</strong> You have an existing NFS share and need to make it available as a volume in the cluster.</li>
+<li><strong>Initial State:</strong> An NFS server is running at <code>192.168.1.100</code> with an exported path <code>/data/shared</code>.</li>
+<li><strong>Task:</strong> Create a PersistentVolume manifest. The PV should have a capacity of <code>5Gi</code>, access mode <code>ReadWriteMany</code>, and a <code>reclaimPolicy</code> of <code>Retain</code>. The volume source should be <code>nfs</code>, with the server set to <code>192.168.1.100</code> and the path to <code>/data/shared</code>. Apply the manifest.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get pv</code>. The new PV should be listed with the status <code>Available</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>This tests your ability to create static PersistentVolumes, specifically for Network File Systems (NFS), which support <code>ReadWriteMany</code> (RWX) access modes.</p>
+<p><strong>Step 1: Create the PV Manifest</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 192.168.1.100
+    path: &quot;/data/shared&quot;
+</code></pre>
+<p><strong>Step 2: Apply and Validate</strong></p>
+<pre><code class="language-bash">kubectl apply -f nfs-pv.yaml
+
+# Check the status
+kubectl get pv nfs-pv
+# Status should be 'Available' (since no PVC has bound to it yet)
+</code></pre>
+<hr />
+<h2>Question 50: Clone a Persistent Volume Claim</h2>
+<ul>
+<li><strong>Scenario:</strong> You need to create a pre-populated volume for a new testing environment by cloning an existing PVC.</li>
+<li><strong>Initial State:</strong> A PVC <code>source-pvc</code> exists and is bound. The underlying CSI driver supports volume cloning.</li>
+<li><strong>Task:</strong> Create a new PVC manifest for a PVC named <code>cloned-pvc</code>. In the <code>spec</code>, add a <code>dataSource</code> block that specifies <code>name: source-pvc</code> and <code>kind: PersistentVolumeClaim</code>. Apply the manifest.</li>
+<li><strong>Validation:</strong> Run <code>kubectl get pvc cloned-pvc</code>. It should become <code>Bound</code>. Create a pod that mounts <code>cloned-pvc</code>, and verify that it contains the same data as the <code>source-pvc</code>.</li>
+</ul>
+<h3>Solution</h3>
+<p>Volume cloning allows you to provision a new PersistentVolumeClaim with data populated from an existing PVC. This is handled by the CSI driver (assuming it supports cloning). The key configuration is the <code>dataSource</code> field.</p>
+<blockquote>
+<p><strong>Note</strong>: The source PVC must be in the same namespace and have the same StorageClass (CSI driver).</p>
+</blockquote>
+<p><strong>Step 1: Create the Clone PVC Manifest</strong></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloned-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi # Must be &gt;= source PVC size
+  storageClassName: fast # Must match source or be a compatible CSI class
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: source-pvc
+</code></pre>
+<p><strong>Step 2: Apply and Validate</strong></p>
+<pre><code class="language-bash"># 1. Apply the manifest
+kubectl apply -f cloned-pvc.yaml
+
+# 2. Check the status
+kubectl get pvc cloned-pvc
+# Status should be 'Bound'
+
+# 3. Validation Pod
+# Create a pod to mount the new volume and inspect contents
+kubectl run validator --image=busybox --restart=Never --command -- sleep 3600
+# (Mounting requires a full manifest or overrides, typically you would just inspect the PV or use a debug pod manifest)
+</code></pre>
+    </body>
+    </html>
+    
