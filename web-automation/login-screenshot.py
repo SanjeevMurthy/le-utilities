@@ -1,6 +1,8 @@
 import time
 from datetime import datetime
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,8 +24,12 @@ def automate_website_interaction():
     # 1. Initialize the WebDriver
     # This will open a new Chrome window.
     # Make sure you have chromedriver installed and in your PATH.
-    driver = webdriver.Chrome()
-    driver.maximize_window()
+    # driver = webdriver.Chrome()
+    # driver.maximize_window()
+
+    print("Setting up ChromeDriver...")
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
 
     try:
         # 2. Open the website
