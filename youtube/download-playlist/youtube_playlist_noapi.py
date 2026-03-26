@@ -12,7 +12,11 @@ except ImportError:
 
 
 def parse_playlist_input(user_input):
-    """Accept a playlist URL or bare playlist ID, return (url, playlist_id)."""
+    """Accept a playlist URL or bare playlist ID, return (url, playlist_id).
+
+    Always normalizes the URL to youtube.com/playlist?list=... format so that
+    yt-dlp treats it as a full playlist (not a single video).
+    """
     user_input = user_input.strip()
     if user_input.startswith(("http://", "https://")):
         parsed = urlparse(user_input)
@@ -21,7 +25,10 @@ def parse_playlist_input(user_input):
         if not playlist_id:
             print("Error: Could not extract playlist ID from URL.")
             sys.exit(1)
-        return user_input, playlist_id
+        # Normalize to a clean playlist URL — watch URLs with &list= params
+        # can cause yt-dlp to treat the input as a single video.
+        url = f"https://www.youtube.com/playlist?list={playlist_id}"
+        return url, playlist_id
     else:
         playlist_id = user_input
         url = f"https://www.youtube.com/playlist?list={playlist_id}"
