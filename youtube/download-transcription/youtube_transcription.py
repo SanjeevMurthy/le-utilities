@@ -47,21 +47,26 @@ except ImportError:
 
 # Delay (seconds) between consecutive transcript downloads in batch mode.
 # A random jitter of ±30% is added to avoid predictable request patterns.
-BATCH_DELAY_SECONDS = 15
+BATCH_DELAY_SECONDS = 30
 
 # Retry settings for individual transcript fetches
 MAX_RETRIES = 5
-RETRY_BASE_DELAY = 30  # seconds — doubles on each retry (30, 60, 120, 240, 480)
+RETRY_BASE_DELAY = 60  # seconds — doubles on each retry (60, 120, 240, 480, 960)
 
 # Adaptive throttling: increase delay after each rate-limit hit
-PROGRESSIVE_DELAY_INCREMENT = 5  # add 5s to batch delay after each block
-MAX_BATCH_DELAY = 60             # cap inter-video delay at 60s
+PROGRESSIVE_DELAY_INCREMENT = 15  # add 15s to batch delay after each block
+MAX_BATCH_DELAY = 180             # cap inter-video delay at 3 minutes
 
 # Cooldown when IP block is detected (seconds)
-IP_BLOCK_COOLDOWN = 120  # 2-minute pause when IP blocked
+IP_BLOCK_COOLDOWN = 300  # 5-minute pause when IP blocked
 
 # Retry queue settings for second-pass retries
-RETRY_QUEUE_DELAY = 60  # 60s between retries in the second pass
+RETRY_QUEUE_DELAY = 120  # 2 minutes between retries in the second pass
+
+# Periodic long break: after every N successful downloads, take an extended
+# pause so a long playlist doesn't produce a sustained request stream.
+LONG_BREAK_EVERY = 10       # take a long break every 10 downloads
+LONG_BREAK_SECONDS = 120    # 2-minute break (±20% jitter)
 
 
 # ─── Shared API Instance ────────────────────────────────────────────
@@ -417,6 +422,15 @@ def batch_delay(
         time.sleep(delay)
 
 
+def long_break(downloads_done: int) -> None:
+    """Take an extended pause after every LONG_BREAK_EVERY downloads."""
+    jitter = random.uniform(0.8, 1.2)
+    pause = LONG_BREAK_SECONDS * jitter
+    print(f"\n  ☕ {downloads_done} transcripts downloaded — taking a "
+          f"{pause:.0f}s break to stay under YouTube's radar...")
+    time.sleep(pause)
+
+
 def ip_block_cooldown() -> None:
     """Pause for a long cooldown when an IP block is detected mid-batch."""
     jitter = random.uniform(0.8, 1.2)
@@ -501,7 +515,16 @@ def process_batch(
     print(f"  Pass 1: Downloading {total} transcripts (delay: {current_delay}s)")
     print(f"{'─' * 60}")
 
+    downloads_since_break = 0
+
     for idx, (vid, title) in enumerate(video_list, start=1):
+        # Skip videos already downloaded in a previous run — no request, no delay
+        existing = os.path.join(output_dir, f"{sanitize_filename(title)}.txt")
+        if os.path.isfile(existing):
+            print(f"\n[{idx}/{total}] ⏭ Already downloaded: {os.path.basename(existing)}")
+            successes += 1
+            continue
+
         ok, _, was_rate_limited = process_single_video(
             video_id=vid,
             format_choice=format_choice,
@@ -512,6 +535,7 @@ def process_batch(
         )
         if ok:
             successes += 1
+            downloads_since_break += 1
         elif was_rate_limited:
             rate_limited_queue.append((vid, title))
             # Increase delay adaptively
@@ -526,8 +550,14 @@ def process_batch(
         else:
             permanent_failures.append((vid, title))
 
-        # Throttle between requests
-        batch_delay(idx, total, current_delay)
+        # Extended pause every LONG_BREAK_EVERY downloads to break up
+        # sustained request streams on long playlists
+        if downloads_since_break >= LONG_BREAK_EVERY:
+            long_break(successes)
+            downloads_since_break = 0
+        else:
+            # Throttle between requests
+            batch_delay(idx, total, current_delay)
 
     # ── Second Pass (Retry Queue) ────────────────────────────────
     if rate_limited_queue:
